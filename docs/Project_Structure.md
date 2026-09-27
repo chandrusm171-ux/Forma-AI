@@ -1,0 +1,33 @@
+# Project Structure
+
+## Overview
+Forma-AI is an AI-augmented dynamic form engine. This document outlines the repository structure.
+
+```text
+Forma-AI/
+├── frontend/                 # React 19 + Vite frontend
+├── backend/                  # Node.js + Express backend
+├── docs/                     # Project documentation
+│   ├── Project_Structure.md  # Folder structure & team roles
+│   └── Frontend.md           # React components & UI guide
+└── README.md
+```
+
+---
+
+## Directory Roles
+
+- **`frontend/`**: Dynamic form rendering using `react-hook-form`, UI components, and state management.
+- **`backend/`**: Express API, MongoDB database connection, and LangChain LLM integration.
+- **`docs/`**: Documentation and architecture notes.
+
+---
+
+## Team Responsibilities
+
+| Member | Role | Responsibilities |
+|---|---|---|
+| **Chandru** | Team Lead | Frontend + Database / Testing |
+| **Khushi** | Backend Developer | Express APIs & DB Integration |
+| **Akshaya** | AI Developer | LangChain & LLM Extraction |
+| **Vishal** | Frontend & Docs | UI Components, Styling & Documentation |
