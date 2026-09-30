@@ -1,12 +1,16 @@
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import FieldRenderer from "./FieldRenderer";
+import ConditionalField from "./ConditionalField";
 
 function DynamicForm({ schema }) {
   const {
     register,
     handleSubmit,
-    formState: { errors }
-  } = useForm();
+    control,
+    formState: { errors },
+  } = useForm({shouldUnregister: true,});
+
+  const values = useWatch({ control });
 
   const onSubmit = (data) => {
     console.log("Form submitted:", data);
@@ -17,29 +21,22 @@ function DynamicForm({ schema }) {
       <div className="form-header">
         <h1>{schema.title}</h1>
 
-        {schema.description && (
-          <p>{schema.description}</p>
-        )}
+        {schema.description && <p>{schema.description}</p>}
       </div>
 
       {schema.fields.map((field) => (
-        <div key={field.name}>
-          <FieldRenderer
-            field={field}
-            register={register}
-          />
+        <ConditionalField key={field.name} field={field} values={values}>
+          <div>
+            <FieldRenderer field={field} register={register} />
 
-          {errors[field.name] && (
-            <p className="error-message">
-              {errors[field.name].message}
-            </p>
-          )}
-        </div>
+            {errors[field.name] && (
+              <p className="error-message">{errors[field.name].message}</p>
+            )}
+          </div>
+        </ConditionalField>
       ))}
 
-      <button type="submit">
-        Submit
-      </button>
+      <button type="submit">Submit</button>
     </form>
   );
 }
