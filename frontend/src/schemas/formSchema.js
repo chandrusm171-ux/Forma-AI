@@ -48,6 +48,18 @@ export const insuranceClaimSchema = {
       name: "hasDamage",
       type: "checkbox",
       label: "Was the vehicle damaged?"
+    },
+    {
+      name: "damageDescription",
+      type: "textarea",
+      label: "Damage Description",
+      placeholder: "Describe the damage...",
+      required: true,
+      condition: {
+        field: "hasDamage",
+        operator: "equals",
+        value: true
+      }
     }
   ]
 };
