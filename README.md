@@ -23,14 +23,28 @@ The goal of Forma AI is to simplify complex forms by combining:
 | Chandru | Team Lead + Frontend + Database/Testing |
 | Khushi | Backend Developer |
 | Akshaya | AI Developer |
-| Vishal | Frontend + Documentation |
+| Vishal | Frontend UI Components + Styling + Documentation Structure |
 
 ## Project Structure
 
 ```text
 Forma-AI/
 │
-├── frontend/       # React frontend
+├── frontend/       # React frontend (Vite + React 19 + React Hook Form)
 ├── backend/        # Node.js + Express backend
-├── docs/           # Project documentation
+├── docs/           # Project documentation & updates
 └── README.md
+```
+
+## Documentation
+
+- [Project Structure & Roles](docs/Project_Structure.md)
+- [Frontend Structure & Day 2 Component Planning](docs/Frontend.md)
+
+## Getting Started (Frontend)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
