@@ -39,7 +39,7 @@ Forma-AI/
 ## Documentation
 
 - [Project Structure & Roles](docs/Project_Structure.md)
-- [Frontend Structure & Day 2 Component Planning](docs/Frontend.md)
+- [Frontend Structure & Component Guide](docs/Frontend.md)
 
 ## Getting Started (Frontend)
 

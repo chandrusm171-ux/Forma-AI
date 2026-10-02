@@ -1,22 +1,20 @@
-function TextField({ field, register }) {
-  return (
-    <div className="form-field">
-      <label htmlFor={field.name}>
-        {field.label}
-        {field.required && <span> *</span>}
-      </label>
+import Input from "../ui/Input";
 
-      <input
-        id={field.name}
-        type="text"
-        placeholder={field.placeholder || ""}
-        {...register(field.name, {
-          required: field.required
-            ? `${field.label} is required`
-            : false
-        })}
-      />
-    </div>
+function TextField({ field, register, error }) {
+  return (
+    <Input
+      id={field.name}
+      label={field.label}
+      type="text"
+      placeholder={field.placeholder || ""}
+      required={field.required}
+      error={error}
+      {...register(field.name, {
+        required: field.required
+          ? `${field.label} is required`
+          : false
+      })}
+    />
   );
 }
 

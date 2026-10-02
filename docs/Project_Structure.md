@@ -31,3 +31,12 @@ Forma-AI/
 | **Khushi** | Backend Developer | Express APIs & DB Integration |
 | **Akshaya** | AI Developer | LangChain & LLM Extraction |
 | **Vishal** | Frontend & Docs | UI Components, Styling & Documentation |
+
+---
+
+## Daily Progress Tracker
+
+- **Day 1**: Initialized Vite + React 19 environment, planned dynamic form engine and core schemas.
+- **Day 2**: Planned reusable component hierarchy, responsive styling strategy, and documentation structure.
+- **Day 3**: Implemented and improved reusable React UI components (`Button`, `Input`, `Loading`), integrated layout shells (`Navbar`, `PageLayout`), and verified components locally.
+

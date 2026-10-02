@@ -1,11 +1,12 @@
 import { useForm } from "react-hook-form";
 import FieldRenderer from "./FieldRenderer";
+import Button from "../ui/Button";
 
 function DynamicForm({ schema }) {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors, isSubmitting }
   } = useForm();
 
   const onSubmit = (data) => {
@@ -15,7 +16,7 @@ function DynamicForm({ schema }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="form-header">
-        <h1>{schema.title}</h1>
+        <h2>{schema.title}</h2>
 
         {schema.description && (
           <p>{schema.description}</p>
@@ -27,9 +28,10 @@ function DynamicForm({ schema }) {
           <FieldRenderer
             field={field}
             register={register}
+            error={errors[field.name]}
           />
 
-          {errors[field.name] && (
+          {field.type !== "text" && errors[field.name] && (
             <p className="error-message">
               {errors[field.name].message}
             </p>
@@ -37,9 +39,16 @@ function DynamicForm({ schema }) {
         </div>
       ))}
 
-      <button type="submit">
-        Submit
-      </button>
+      <div style={{ marginTop: "24px" }}>
+        <Button
+          type="submit"
+          variant="primary"
+          size="md"
+          isLoading={isSubmitting}
+        >
+          Submit Claim
+        </Button>
+      </div>
     </form>
   );
 }

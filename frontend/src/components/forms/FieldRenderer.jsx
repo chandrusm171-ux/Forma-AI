@@ -3,10 +3,10 @@ import SelectField from "./SelectField";
 import CheckboxField from "./CheckboxField";
 import TextareaField from "./TextareaField";
 
-function FieldRenderer({ field, register }) {
+function FieldRenderer({ field, register, error }) {
   switch (field.type) {
     case "text":
-      return <TextField field={field} register={register} />;
+      return <TextField field={field} register={register} error={error} />;
 
     case "select":
       return <SelectField field={field} register={register} />;
