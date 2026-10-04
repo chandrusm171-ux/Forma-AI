@@ -20,12 +20,14 @@ function FormPage() {
 
   return (
     <PageLayout>
-      <MagicInput onAnalyze={handleAnalyze} />
+      <div className="form-page-layout">
+        <MagicInput onAnalyze={handleAnalyze} />
 
-      <DynamicForm
-        schema={insuranceClaimSchema}
-        initialValues={prefillData}
-      />
+        <DynamicForm
+          schema={insuranceClaimSchema}
+          initialValues={prefillData}
+        />
+      </div>
     </PageLayout>
   );
 }

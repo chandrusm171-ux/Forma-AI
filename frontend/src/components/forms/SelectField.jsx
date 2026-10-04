@@ -3,7 +3,10 @@ function SelectField({ field, register }) {
     <div className="form-field">
       <label htmlFor={field.name}>
         {field.label}
-        {field.required && <span> *</span>}
+        {field.required && (
+          <span style={{ color: "var(--color-danger)", marginLeft: "2px" }}
+                aria-hidden="true"> *</span>
+        )}
       </label>
 
       <select
@@ -11,10 +14,10 @@ function SelectField({ field, register }) {
         {...register(field.name, {
           required: field.required
             ? `${field.label} is required`
-            : false
+            : false,
         })}
       >
-        <option value="">Select an option</option>
+        <option value="">— Select an option —</option>
 
         {field.options?.map((option) => (
           <option key={option.value} value={option.value}>

@@ -34,12 +34,15 @@ function TextareaField({ field, register }) {
     <div className="form-field">
       <label htmlFor={field.name}>
         {field.label}
-        {field.required && <span> *</span>}
+        {field.required && (
+          <span style={{ color: "var(--color-danger)", marginLeft: "2px" }}
+                aria-hidden="true"> *</span>
+        )}
       </label>
 
       <textarea
         id={field.name}
-        rows="5"
+        rows="4"
         placeholder={field.placeholder || ""}
         {...register(field.name, rules)}
       />

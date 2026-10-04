@@ -14,6 +14,8 @@
 | **Day 1** | Setup & Structure | Set up Vite + React 19 environment, analyzed folder structure, and planned form engine architecture. |
 | **Day 2** | UI/Component Planning | **Day 2 Update:** Planned the reusable React components and page-wise UI structure. Identified areas requiring UI and responsive improvements. |
 | **Day 3** | React UI Components | **Day 3 Update:** Implemented and improved reusable React UI components. Verified the updated components locally. |
+| **Day 4 (Main Pages)** | Main Pages & Sections | **Day 4 Update:** Developed the assigned frontend sections (`Home`, `FormPage`, `ResumePage`) and integrated reusable React components into the UI. |
+| **Day 4 (Styling)** | Styling & UI Consistency | **Day 4 Update:** Improved styling including spacing scale, Inter font typography, alignment, select arrow, checkbox hover states, focus rings, and overall UI consistency across assigned sections. |
 
 ---
 
