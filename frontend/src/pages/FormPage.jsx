@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DynamicForm from "../components/forms/DynamicForm";
+import MagicInput from "../components/ai/MagicInput";
 import PageLayout from "../components/layout/PageLayout";
 import { insuranceClaimSchema } from "../schemas/formSchema";
 import { extractFormData } from "../services/aiService";
@@ -19,7 +20,12 @@ function FormPage() {
 
   return (
     <PageLayout>
-      <DynamicForm schema={insuranceClaimSchema} />
+      <MagicInput onAnalyze={handleAnalyze} />
+
+      <DynamicForm
+        schema={insuranceClaimSchema}
+        initialValues={prefillData}
+      />
     </PageLayout>
   );
 }

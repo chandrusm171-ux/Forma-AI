@@ -1,14 +1,27 @@
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import FieldRenderer from "./FieldRenderer";
+import ConditionalField from "./ConditionalField";
 import Button from "../ui/Button";
 
 function DynamicForm({ schema, initialValues = {} }) {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
-  } = useForm();
+    control,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    shouldUnregister: true,
+  });
+
+  const values = useWatch({ control });
+
+  useEffect(() => {
+    if (Object.keys(initialValues).length > 0) {
+      reset(initialValues);
+    }
+  }, [initialValues, reset]);
 
   const onSubmit = (data) => {
     console.log("Form submitted:", data);
@@ -23,19 +36,19 @@ function DynamicForm({ schema, initialValues = {} }) {
       </div>
 
       {schema.fields.map((field) => (
-        <div key={field.name}>
-          <FieldRenderer
-            field={field}
-            register={register}
-            error={errors[field.name]}
-          />
+        <ConditionalField key={field.name} field={field} values={values}>
+          <div>
+            <FieldRenderer
+              field={field}
+              register={register}
+              error={errors[field.name]}
+            />
 
-          {field.type !== "text" && errors[field.name] && (
-            <p className="error-message">
-              {errors[field.name].message}
-            </p>
-          )}
-        </div>
+            {field.type !== "text" && errors[field.name] && (
+              <p className="error-message">{errors[field.name].message}</p>
+            )}
+          </div>
+        </ConditionalField>
       ))}
 
       <div style={{ marginTop: "24px" }}>
