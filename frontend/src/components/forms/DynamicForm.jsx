@@ -1,8 +1,9 @@
-import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import FieldRenderer from "./FieldRenderer";
 import Button from "../ui/Button";
 
-function DynamicForm({ schema }) {
+function DynamicForm({ schema, initialValues = {} }) {
   const {
     register,
     handleSubmit,
@@ -18,9 +19,7 @@ function DynamicForm({ schema }) {
       <div className="form-header">
         <h2>{schema.title}</h2>
 
-        {schema.description && (
-          <p>{schema.description}</p>
-        )}
+        {schema.description && <p>{schema.description}</p>}
       </div>
 
       {schema.fields.map((field) => (
