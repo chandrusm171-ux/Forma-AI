@@ -81,6 +81,13 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  /* Hide scrollbar but keep scrolling */
+  scrollbar-width: none;          /* Firefox */
+}
+
+html::-webkit-scrollbar {
+  display: none;                  /* Chrome, Edge, Safari */
 }
 
 body {
@@ -91,6 +98,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -128,8 +136,10 @@ code {
 .site-header {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 40;
   box-shadow: var(--shadow-sm);
 }
@@ -247,6 +257,7 @@ code {
   width: 100%;
   margin: 0 auto;
   padding: var(--space-8) var(--space-5);
+  padding-top: calc(64px + var(--space-8));  /* offset for fixed navbar */
 }
 
 /* ==========================================================================
@@ -805,39 +816,119 @@ button {
 }
 
 /* ==========================================================================
-   Responsive — Mobile ( < 640px )
+   Mobile Navigation – Hamburger Toggle & Drawer
    ========================================================================== */
-@media (max-width: 640px) {
-  .navbar-container {
-    padding: 0 var(--space-4);
-    height: 56px;
-  }
 
-  .navbar-nav {
-    display: none;
-  }
-
-  .main-content {
-    padding: var(--space-5) var(--space-4);
-  }
-
-  form {
-    padding: var(--space-5) var(--space-4);
-    border-radius: var(--radius-md);
-  }
-
-  .form-header h2 {
-    font-size: var(--font-size-xl);
-  }
-
-  .magic-input {
-    padding: var(--space-5) var(--space-4);
-  }
-
-  .ui-btn-full-mobile {
-    width: 100%;
-  }
+/* Hamburger button (hidden on desktop) */
+.mobile-menu-toggle {
+  display: none;            /* shown via media-query below */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  z-index: 52;
+  transition: background var(--transition-fast);
 }
+
+.mobile-menu-toggle:hover {
+  background: var(--color-surface-raised);
+}
+
+.hamburger-line {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--color-text);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.25s ease;
+}
+
+/* Animated X state */
+.mobile-menu-toggle.is-open .hamburger-line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.mobile-menu-toggle.is-open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+.mobile-menu-toggle.is-open .hamburger-line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Backdrop overlay */
+.mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(4px);
+  z-index: 41;
+  animation: fadeIn 0.2s ease both;
+}
+
+/* Slide-down drawer (hidden by default) */
+.mobile-nav-drawer {
+  display: none;            /* shown via media-query below */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 42;
+  flex-direction: column;
+  gap: var(--space-1);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-4) var(--space-5);
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.25s ease, padding 0.3s ease;
+}
+
+.mobile-nav-drawer.is-open {
+  max-height: 400px;
+  opacity: 1;
+  transform: translateY(0);
+  padding: var(--space-5);
+}
+
+.mobile-nav-drawer .nav-link {
+  display: block;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.mobile-nav-drawer .nav-link:hover {
+  color: var(--color-text);
+  background: var(--color-surface-raised);
+}
+
+.mobile-nav-drawer .nav-link.active {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  font-weight: 600;
+}
+
+.mobile-nav-status {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: center;
+}
+
 /* ========================================================================
    Home Page
    ======================================================================== */
@@ -872,7 +963,7 @@ button {
 
 .home-hero-copy h1 {
   max-width: 720px;
-  font-size: clamp(2.25rem, 5vw, 4rem);
+  font-size: clamp(1.75rem, 5vw, 4rem);
   font-weight: 800;
   line-height: 1.05;
   letter-spacing: -0.045em;
@@ -880,7 +971,7 @@ button {
 
 .home-hero-copy p {
   max-width: 650px;
-  font-size: var(--font-size-lg);
+  font-size: clamp(0.9375rem, 1.5vw, 1.125rem);
 }
 
 .home-actions {
@@ -951,7 +1042,7 @@ button {
 }
 
 .home-section-heading h2 {
-  font-size: var(--font-size-2xl);
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
 }
 
 .feature-grid {
@@ -1002,12 +1093,13 @@ button {
 }
 
 .resume-header h1 {
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: clamp(1.5rem, 4vw, 3rem);
   font-weight: 800;
 }
 
 .resume-header p {
   max-width: 700px;
+  font-size: clamp(0.875rem, 1.5vw, 1rem);
 }
 
 .resume-upload-card {
@@ -1093,36 +1185,309 @@ button {
   text-decoration: underline;
 }
 
-@media (max-width: 800px) {
+/* ==========================================================================
+   Responsive — Tablet ( 481px – 768px )
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* ── Navbar ── */
+  .navbar-nav {
+    display: none;
+  }
+
+  .navbar-actions {
+    display: none;
+  }
+
+  .mobile-menu-toggle {
+    display: flex;
+  }
+
+  .mobile-nav-drawer {
+    display: flex;
+  }
+
+  .navbar-container {
+    padding: 0 var(--space-4);
+    height: 58px;
+  }
+
+  /* ── Main Content ── */
+  .main-content {
+    padding: var(--space-6) var(--space-5);
+    padding-top: calc(58px + var(--space-6));
+  }
+
+  /* ── Home Page ── */
   .home-hero {
     grid-template-columns: 1fr;
+    gap: var(--space-6);
     padding: var(--space-6) 0;
   }
 
+  .home-hero-copy {
+    align-items: center;
+    text-align: center;
+  }
+
+  .home-actions {
+    justify-content: center;
+  }
+
   .feature-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  /* ── Forms ── */
+  form {
+    padding: var(--space-6) var(--space-5);
+    border-radius: var(--radius-md);
+  }
+
+  .form-header h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  .magic-input {
+    padding: var(--space-5) var(--space-4);
+  }
+
+  /* ── Resume Page ── */
+  .resume-upload-area {
+    min-height: 180px;
+    padding: var(--space-6);
+  }
+
+  .resume-upload-card {
+    padding: var(--space-6);
   }
 }
 
-@media (max-width: 640px) {
-  .home-page {
-    gap: var(--space-8);
+/* ==========================================================================
+   Responsive — Mobile ( ≤ 480px )
+   ========================================================================== */
+@media (max-width: 480px) {
+  /* ── Navbar ── */
+  .navbar-container {
+    padding: 0 var(--space-3);
+    height: 52px;
   }
 
-  .home-actions,
-  .resume-actions {
+  .brand-name {
+    font-size: var(--font-size-sm);
+  }
+
+  .brand-badge {
+    font-size: 0.65rem;
+    padding: 2px 5px;
+  }
+
+  .mobile-nav-drawer.is-open {
+    padding: var(--space-4);
+  }
+
+  /* ── Main Content ── */
+  .main-content {
+    padding: var(--space-5) var(--space-3);
+    padding-top: calc(52px + var(--space-5));
+  }
+
+  /* ── Home Page ── */
+  .home-page {
+    gap: var(--space-6);
+  }
+
+  .home-hero {
+    padding: var(--space-4) 0;
+    gap: var(--space-5);
+  }
+
+  .home-hero-copy h1 {
+    font-size: clamp(1.5rem, 6vw, 2.25rem);
+  }
+
+  .home-actions {
     width: 100%;
     flex-direction: column;
     align-items: stretch;
   }
 
   .home-action-link,
-  .home-action-link .ui-btn,
+  .home-action-link .ui-btn {
+    width: 100%;
+  }
+
+  .home-hero-card {
+    padding: var(--space-4);
+  }
+
+  .workflow-number {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .workflow-line {
+    margin-left: 18px;
+    height: 22px;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .feature-card {
+    padding: var(--space-4);
+  }
+
+  .feature-card h3 {
+    font-size: var(--font-size-md);
+  }
+
+  .home-section-heading h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  /* ── Forms ── */
+  form {
+    padding: var(--space-4) var(--space-3);
+    border-radius: var(--radius-sm);
+  }
+
+  .form-header {
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+  }
+
+  .form-header h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  .form-field {
+    margin-bottom: var(--space-4);
+  }
+
+  .magic-input {
+    padding: var(--space-4) var(--space-3);
+    border-radius: var(--radius-md);
+  }
+
+  .magic-input-header h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  .ui-btn-md {
+    padding: 10px 16px;
+    font-size: var(--font-size-sm);
+  }
+
+  .ui-btn-lg {
+    padding: 12px 22px;
+    font-size: var(--font-size-sm);
+  }
+
+  .ui-btn-full-mobile {
+    width: 100%;
+  }
+
+  /* ── Resume Page ── */
+  .resume-upload-card {
+    padding: var(--space-4);
+  }
+
+  .resume-upload-area {
+    min-height: 150px;
+    padding: var(--space-4);
+  }
+
+  .resume-upload-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .resume-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
   .resume-actions .ui-btn {
     width: 100%;
   }
 
-  .resume-upload-card {
-    padding: var(--space-5);
+  .resume-back-link {
+    text-align: center;
+  }
+
+  /* ── UI Components ── */
+  .ui-input-wrapper {
+    margin-bottom: var(--space-4);
+  }
+
+  .site-footer {
+    padding: var(--space-4) var(--space-3);
+    font-size: 0.7rem;
+  }
+
+  /* ── Loading ── */
+  .ui-loading-md .ui-loading-spinner svg { width: 28px; height: 28px; }
+  .ui-loading-lg .ui-loading-spinner svg { width: 40px; height: 40px; }
+}
+
+/* ==========================================================================
+   Responsive — Small Mobile ( ≤ 360px )  –  compact edge-case tweaks
+   ========================================================================== */
+@media (max-width: 360px) {
+  .navbar-container {
+    gap: var(--space-2);
+  }
+
+  .brand-name {
+    font-size: 0.8rem;
+  }
+
+  .main-content {
+    padding: var(--space-4) var(--space-2);
+  }
+
+  form {
+    padding: var(--space-3) var(--space-2);
+  }
+
+  .magic-input {
+    padding: var(--space-3) var(--space-2);
+  }
+
+  .home-hero-copy h1 {
+    font-size: 1.35rem;
+  }
+
+  .feature-card {
+    padding: var(--space-3);
+  }
+
+  .resume-upload-area {
+    min-height: 120px;
+  }
+}
+
+/* ==========================================================================
+   Responsive — Large Desktop ( ≥ 1200px )  –  wider content area
+   ========================================================================== */
+@media (min-width: 1200px) {
+  .navbar-container {
+    max-width: 1200px;
+  }
+
+  .home-hero {
+    gap: var(--space-12);
+  }
+
+  .feature-grid {
+    gap: var(--space-6);
   }
 }

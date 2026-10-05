@@ -39,4 +39,6 @@ Forma-AI/
 - **Day 1**: Initialized Vite + React 19 environment, planned dynamic form engine and core schemas.
 - **Day 2**: Planned reusable component hierarchy, responsive styling strategy, and documentation structure.
 - **Day 3**: Implemented and improved reusable React UI components (`Button`, `Input`, `Loading`), integrated layout shells (`Navbar`, `PageLayout`), and verified components locally.
+- **Day 4**: Developed main pages (`Home`, `FormPage`, `ResumePage`), integrated reusable React components, and refined styling (spacing scale, Inter font typography, alignment, focus rings, and overall UI consistency).
+- **Day 5**: Implemented comprehensive responsive layouts for mobile (≤ 480 px), tablet (481–768 px), and desktop (769 px+). Added animated hamburger menu for mobile navigation, fluid typography, and tested the UI at multiple viewport widths (320 px – 1920 px). Updated all documentation.
 
