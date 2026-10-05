@@ -1,21 +1,34 @@
+import { NavLink } from "react-router-dom";
 
 function Navbar({ brandName = "Forma AI" }) {
+  const getNavClass = ({ isActive }) =>
+    `nav-link${isActive ? " active" : ""}`;
+
   return (
     <header className="site-header">
       <div className="navbar-container">
-        <a href="/" className="navbar-brand">
+        <NavLink to="/" className="navbar-brand" aria-label="Forma AI home">
           <span className="brand-badge">AI</span>
           <span className="brand-name">{brandName}</span>
-        </a>
+        </NavLink>
 
         <nav className="navbar-nav" aria-label="Main Navigation">
-          <a href="/" className="nav-link active">Home</a>
-          <a href="#forms" className="nav-link">Forms</a>
-          <a href="#resume" className="nav-link">Resume Parser</a>
+          <NavLink to="/" end className={getNavClass}>
+            Home
+          </NavLink>
+          <NavLink to="/form" className={getNavClass}>
+            Forms
+          </NavLink>
+          <NavLink to="/resume" className={getNavClass}>
+            Resume Parser
+          </NavLink>
         </nav>
 
         <div className="navbar-actions">
-          <span className="status-pill status-ready">Engine Ready</span>
+          <span className="status-pill status-ready">
+            <span className="pulse-dot" aria-hidden="true" />
+            Engine Ready
+          </span>
         </div>
       </div>
     </header>
