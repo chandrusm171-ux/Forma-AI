@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 /**
  * Navbar – Site-wide top navigation bar.
@@ -14,12 +14,6 @@ import { NavLink, useLocation } from "react-router-dom";
  */
 function Navbar({ brandName = "Forma AI" }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const location = useLocation();
-
-  /* Close mobile drawer on navigation */
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [location.pathname]);
 
   /* Prevent body scroll when mobile menu is open */
   useEffect(() => {
@@ -82,6 +76,9 @@ function Navbar({ brandName = "Forma AI" }) {
       <nav
         className={`mobile-nav-drawer${mobileOpen ? " is-open" : ""}`}
         aria-label="Mobile Navigation"
+        onClick={(event) => {
+          if (event.target.closest("a")) setMobileOpen(false);
+        }}
       >
         <NavLink to="/" end className={getNavClass}>
           Home
