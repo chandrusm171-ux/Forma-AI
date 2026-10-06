@@ -798,6 +798,421 @@ button {
 }
 
 /* ==========================================================================
+   UI Components – Toast Notifications
+   ========================================================================== */
+.ui-toast {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 300px;
+  max-width: 480px;
+  border: 1px solid transparent;
+  backdrop-filter: blur(8px);
+}
+
+.ui-toast-enter {
+  animation: toastSlideIn 0.35s ease both;
+}
+
+.ui-toast-exit {
+  animation: toastSlideOut 0.3s ease both;
+}
+
+.ui-toast-icon svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.ui-toast-message {
+  flex: 1;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.ui-toast-close {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+  display: flex;
+  align-items: center;
+}
+
+.ui-toast-close:hover {
+  opacity: 1;
+}
+
+.ui-toast-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Toast variants */
+.ui-toast-success {
+  background: rgba(236, 253, 245, 0.95);
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.ui-toast-success .ui-toast-close {
+  color: #065f46;
+}
+
+.ui-toast-error {
+  background: rgba(254, 242, 242, 0.95);
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.ui-toast-error .ui-toast-close {
+  color: #991b1b;
+}
+
+.ui-toast-warning {
+  background: rgba(255, 251, 235, 0.95);
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.ui-toast-warning .ui-toast-close {
+  color: #92400e;
+}
+
+.ui-toast-info {
+  background: rgba(239, 246, 255, 0.95);
+  border-color: #bfdbfe;
+  color: #1e40af;
+}
+
+.ui-toast-info .ui-toast-close {
+  color: #1e40af;
+}
+
+/* ==========================================================================
+   UI Components – Skeleton Placeholders
+   ========================================================================== */
+.ui-skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+.ui-skeleton-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ui-skeleton-circle {
+  border-radius: 50%;
+}
+
+.ui-skeleton-card {
+  border-radius: var(--radius-md);
+}
+
+/* ==========================================================================
+   UI Components – Progress Bar
+   ========================================================================== */
+.ui-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ui-progress-label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.ui-progress-track {
+  width: 100%;
+  background: var(--color-border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.ui-progress-track-sm {
+  height: 4px;
+}
+
+.ui-progress-track-md {
+  height: 8px;
+}
+
+.ui-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), #6366f1);
+  border-radius: var(--radius-pill);
+  transition: width 0.3s ease;
+}
+
+.ui-progress-indeterminate {
+  width: 40% !important;
+  animation: progressIndeterminate 1.5s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   MagicInput – Loading & Status States (Day 6)
+   ========================================================================== */
+.magic-input-busy {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+}
+
+.magic-input-progress {
+  animation: fadeIn var(--transition-fast) ease both;
+}
+
+.magic-input-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.magic-input-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  animation: fadeIn var(--transition-normal) ease both;
+}
+
+/* ── Status banners (success / error) ── */
+.magic-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  animation: fadeIn var(--transition-fast) ease both;
+}
+
+.magic-status-icon svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.magic-status-message {
+  flex: 1;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.magic-status-dismiss {
+  background: none;
+  border: none;
+  padding: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+  line-height: 1;
+}
+
+.magic-status-dismiss:hover {
+  opacity: 1;
+}
+
+.magic-status-success {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.magic-status-error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+/* ==========================================================================
+   DynamicForm – Submit Status Banner (Day 6)
+   ========================================================================== */
+.form-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.form-fieldset:disabled {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.form-submit-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  margin-bottom: var(--space-5);
+  animation: fadeIn var(--transition-fast) ease both;
+}
+
+.form-submit-status-icon svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.form-submit-status p {
+  flex: 1;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.form-submit-status-dismiss {
+  background: none;
+  border: none;
+  padding: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+  line-height: 1;
+}
+
+.form-submit-status-dismiss:hover {
+  opacity: 1;
+}
+
+.form-submit-success {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.form-submit-error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+/* ==========================================================================
+   FormPage – Section Wrapper for Loading Overlay (Day 6)
+   ========================================================================== */
+.form-section-wrapper {
+  position: relative;
+}
+
+/* ==========================================================================
+   ResumePage – Parsing Progress & Results (Day 6)
+   ========================================================================== */
+.resume-upload-card {
+  position: relative;
+}
+
+.resume-progress {
+  margin-top: var(--space-4);
+  animation: fadeIn var(--transition-fast) ease both;
+}
+
+.resume-results-card {
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  animation: fadeIn var(--transition-normal) ease both;
+}
+
+.resume-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.resume-results-header h2 {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin: 0;
+}
+
+.resume-results-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: #ecfdf5;
+  color: #059669;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  border: 1px solid #a7f3d0;
+}
+
+.resume-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+.resume-result-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.resume-result-label {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.resume-result-value {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.resume-result-skills {
+  grid-column: 1 / -1;
+}
+
+.resume-skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.resume-skill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+/* ==========================================================================
    Animations
    ========================================================================== */
 @keyframes spin {
@@ -808,6 +1223,26 @@ button {
   0%   { stroke-dasharray: 1, 150; stroke-dashoffset: 0;    }
   50%  { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
   100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124;}
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateX(30px) scale(0.95); }
+  to   { opacity: 1; transform: translateX(0) scale(1);       }
+}
+
+@keyframes toastSlideOut {
+  from { opacity: 1; transform: translateX(0) scale(1);       }
+  to   { opacity: 0; transform: translateX(30px) scale(0.95); }
+}
+
+@keyframes progressIndeterminate {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(350%);  }
 }
 
 @keyframes fadeIn {
@@ -1261,6 +1696,22 @@ button {
   .resume-upload-card {
     padding: var(--space-6);
   }
+
+  /* ── Day 6 Loading States ── */
+  .ui-toast {
+    left: var(--space-4);
+    right: var(--space-4);
+    min-width: auto;
+    max-width: none;
+  }
+
+  .resume-results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .magic-input-actions {
+    flex-wrap: wrap;
+  }
 }
 
 /* ==========================================================================
@@ -1436,6 +1887,38 @@ button {
   /* ── Loading ── */
   .ui-loading-md .ui-loading-spinner svg { width: 28px; height: 28px; }
   .ui-loading-lg .ui-loading-spinner svg { width: 40px; height: 40px; }
+
+  /* ── Day 6 Loading States ── */
+  .ui-toast {
+    bottom: var(--space-3);
+    left: var(--space-3);
+    right: var(--space-3);
+    min-width: auto;
+    max-width: none;
+  }
+
+  .magic-input-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .magic-input-hint {
+    text-align: center;
+  }
+
+  .resume-results-card {
+    padding: var(--space-4);
+  }
+
+  .resume-results-grid {
+    gap: var(--space-3);
+  }
+
+  .magic-status,
+  .form-submit-status {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-xs);
+  }
 }
 
 /* ==========================================================================

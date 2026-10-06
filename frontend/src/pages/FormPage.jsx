@@ -2,20 +2,48 @@ import { useState } from "react";
 import DynamicForm from "../components/forms/DynamicForm";
 import MagicInput from "../components/ai/MagicInput";
 import PageLayout from "../components/layout/PageLayout";
+import { Loading, Toast } from "../components/ui";
 import { insuranceClaimSchema } from "../schemas/formSchema";
 import { extractFormData } from "../services/aiService";
 
+/**
+ * FormPage – Main dynamic form page with AI-assisted prefill.
+ *
+ * Loading states:
+ * - While AI extraction is in progress, a blurred overlay with a spinner
+ *   is displayed over the form section so users know the form is being populated.
+ * - A Toast notification confirms success or reports errors after extraction.
+ */
 function FormPage() {
   const [prefillData, setPrefillData] = useState({});
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [toast, setToast] = useState({ visible: false, type: "info", message: "" });
+
+  const showToast = (type, message) => {
+    setToast({ visible: true, type, message });
+  };
+
+  const hideToast = () => {
+    setToast((prev) => ({ ...prev, visible: false }));
+  };
 
   const handleAnalyze = async (story) => {
     console.log("AI input:", story);
 
-    const extractedData = await extractFormData(story);
+    setIsExtracting(true);
 
-    console.log("Extracted data:", extractedData);
-
-    setPrefillData(extractedData);
+    try {
+      const extractedData = await extractFormData(story);
+      console.log("Extracted data:", extractedData);
+      setPrefillData(extractedData);
+      showToast("success", "Form fields have been populated with extracted data.");
+    } catch (error) {
+      console.error("Extraction failed:", error);
+      showToast("error", error?.message || "Failed to extract data. Please try again.");
+      throw error; // re-throw so MagicInput can also show its own status
+    } finally {
+      setIsExtracting(false);
+    }
   };
 
   return (
@@ -23,11 +51,31 @@ function FormPage() {
       <div className="form-page-layout">
         <MagicInput onAnalyze={handleAnalyze} />
 
-        <DynamicForm
-          schema={insuranceClaimSchema}
-          initialValues={prefillData}
-        />
+        {/* ── Form section with loading overlay ── */}
+        <div className="form-section-wrapper">
+          {isExtracting && (
+            <Loading
+              overlay
+              size="lg"
+              text="Extracting form data from your description…"
+            />
+          )}
+
+          <DynamicForm
+            schema={insuranceClaimSchema}
+            initialValues={prefillData}
+          />
+        </div>
       </div>
+
+      {/* ── Global toast feedback ── */}
+      <Toast
+        type={toast.type}
+        message={toast.message}
+        visible={toast.visible}
+        onClose={hideToast}
+        duration={5000}
+      />
     </PageLayout>
   );
 }
