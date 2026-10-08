@@ -20,6 +20,7 @@
 | **Day 4 (Styling)** | Styling & UI Consistency | Improved styling including spacing scale, Inter font typography, alignment, select arrow, checkbox hover states, focus rings, and overall UI consistency across assigned sections. |
 | **Day 5** | Responsive Design | Implemented comprehensive responsive layouts for **mobile** (≤ 480 px), **tablet** (481–768 px), and **desktop** (769 px+). Added animated hamburger menu for mobile navigation, fluid typography via `clamp()`, and tested the UI at multiple viewport widths. Updated all documentation. |
 | **Day 6** | Loading States & User Feedback | Added and improved loading states, skeleton placeholders, progress bars, toast notifications, and inline status banners for all asynchronous frontend operations. Enhanced `MagicInput`, `DynamicForm`, `FormPage`, and `ResumePage` with comprehensive user feedback. |
+| **Day 7** | Error & Empty States | Added user-friendly error, empty, and fallback states (`ErrorState`, `EmptyState`) to improve the frontend user experience in edge cases (no data, API failure, etc.). Updated documentation. |
 
 ---
 
@@ -264,3 +265,27 @@ Add and improve loading states and user feedback for all relevant asynchronous f
 3. **Overlay on the form card, not fullscreen** — keeps the MagicInput visible so users can track what they typed while the form populates.
 4. **Fieldset disabling vs. individual field disabling** — a single `<fieldset disabled>` is cleaner and catches all inputs without needing per-field logic.
 5. **Simulated delays in aiService** — enables realistic loading-state testing during development without requiring backend availability.
+
+---
+
+## Day 7 — Error & Empty States Update
+
+### Objective
+Enhance user experience and handle edge cases gracefully by implementing robust error, empty, and fallback states across the application. These states ensure users receive clear, actionable feedback when data is unavailable or an error occurs.
+
+### New UI Primitives (`components/ui/`)
+
+#### 1. `EmptyState.jsx`
+- **Purpose**: Displays a friendly fallback when no data is available (e.g. no resume parsed, no form schema loaded).
+- **Features**: Customizable title, description, icon, and primary action button to guide users on what to do next.
+
+#### 2. `ErrorState.jsx`
+- **Purpose**: Handles API failures, unexpected exceptions, or failed extractions gracefully.
+- **Features**: Displays an error icon, helpful context, and an optional retry button to encourage users to attempt the action again without a full page reload.
+
+### CSS Enhancements (`index.css`)
+- **Shared Styles**: Both `EmptyState` and `ErrorState` share consistent layouts (centered flexbox, padding, background colors, and subtle box-shadows).
+- **Responsive Handling**: The components automatically adjust their internal spacing and typography for mobile and tablet viewports to maintain readability.
+
+### Barrel Export Updated
+`components/ui/index.js` now exports `EmptyState` and `ErrorState` alongside the existing primitives, enabling clean imports across all pages.

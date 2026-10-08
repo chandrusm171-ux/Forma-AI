@@ -42,4 +42,5 @@ Forma-AI/
 - **Day 4**: Developed main pages (`Home`, `FormPage`, `ResumePage`), integrated reusable React components, and refined styling (spacing scale, Inter font typography, alignment, focus rings, and overall UI consistency).
 - **Day 5**: Implemented comprehensive responsive layouts for mobile (≤ 480 px), tablet (481–768 px), and desktop (769 px+). Added animated hamburger menu for mobile navigation, fluid typography, and tested the UI at multiple viewport widths (320 px – 1920 px). Updated all documentation.
 - **Day 6**: Added and improved loading states and user feedback for all asynchronous frontend operations. Created new UI primitives (`Toast`, `Skeleton`, `ProgressBar`). Enhanced `MagicInput`, `DynamicForm`, `FormPage`, and `ResumePage` with loading overlays, progress bars, status banners, and toast notifications. Updated documentation.
+- **Day 7**: Added user-friendly error, empty, and fallback states (`ErrorState`, `EmptyState`) to improve the frontend user experience. Updated documentation to reflect these changes.
 
