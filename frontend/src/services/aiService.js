@@ -32,6 +32,7 @@ export async function extractFormData(story) {
   await delay(2000);
 
   return {
+    fullName: "John Doe",
     incidentType: "animal_collision",
     vehicle: "Honda City",
     description: story,
