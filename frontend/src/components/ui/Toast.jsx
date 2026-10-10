@@ -21,33 +21,26 @@ function Toast({
   onClose,
   className = "",
 }) {
-  const [isShowing, setIsShowing] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
   const dismiss = useCallback(() => {
+    if (isExiting) return;
+
     setIsExiting(true);
     setTimeout(() => {
-      setIsShowing(false);
       setIsExiting(false);
-      if (onClose) onClose();
+      onClose?.();
     }, 300); // matches CSS exit animation duration
-  }, [onClose]);
+  }, [isExiting, onClose]);
 
   useEffect(() => {
-    if (visible) {
-      setIsShowing(true);
-      setIsExiting(false);
-    }
-  }, [visible]);
-
-  useEffect(() => {
-    if (isShowing && duration > 0) {
+    if (visible && duration > 0) {
       const timer = setTimeout(dismiss, duration);
       return () => clearTimeout(timer);
     }
-  }, [isShowing, duration, dismiss]);
+  }, [visible, duration, dismiss]);
 
-  if (!isShowing) return null;
+  if (!visible && !isExiting) return null;
 
   const icons = {
     success: (
