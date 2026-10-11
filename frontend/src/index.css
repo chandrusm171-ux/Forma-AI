@@ -505,6 +505,24 @@ textarea::placeholder {
   background: var(--color-surface);
 }
 
+/* Form field error states for native select / textarea / checkbox */
+.form-field.has-error select,
+.form-field.has-error textarea {
+  border-color: var(--color-danger);
+  background-color: #fff5f5;
+}
+
+.form-field.has-error select:focus,
+.form-field.has-error textarea:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+}
+
+.form-field.has-error.checkbox-field label {
+  border-color: var(--color-danger);
+  background: #fff5f5;
+}
+
 /* ==========================================================================
    Native button reset  (all styled <button> use .ui-btn overrides)
    ========================================================================== */

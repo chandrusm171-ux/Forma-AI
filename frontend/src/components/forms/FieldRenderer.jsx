@@ -9,13 +9,13 @@ function FieldRenderer({ field, register, error }) {
       return <TextField field={field} register={register} error={error} />;
 
     case "select":
-      return <SelectField field={field} register={register} />;
+      return <SelectField field={field} register={register} error={error} />;
 
     case "textarea":
-      return <TextareaField field={field} register={register} />;
+      return <TextareaField field={field} register={register} error={error} />;
 
     case "checkbox":
-      return <CheckboxField field={field} register={register} />;
+      return <CheckboxField field={field} register={register} error={error} />;
 
     default:
       return (
