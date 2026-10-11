@@ -9,7 +9,8 @@ Forma-AI/
 ├── backend/                  # Node.js + Express backend
 ├── docs/                     # Project documentation
 │   ├── Project_Structure.md  # Folder structure & team roles
-│   └── Frontend.md           # React components & UI guide
+│   ├── Frontend.md           # React components & UI guide
+│   └── Backend.md            # Backend setup & API documentation
 └── README.md
 ```
 
@@ -43,4 +44,5 @@ Forma-AI/
 - **Day 5**: Implemented comprehensive responsive layouts for mobile (≤ 480 px), tablet (481–768 px), and desktop (769 px+). Added animated hamburger menu for mobile navigation, fluid typography, and tested the UI at multiple viewport widths (320 px – 1920 px). Updated all documentation.
 - **Day 6**: Added and improved loading states and user feedback for all asynchronous frontend operations. Created new UI primitives (`Toast`, `Skeleton`, `ProgressBar`). Enhanced `MagicInput`, `DynamicForm`, `FormPage`, and `ResumePage` with loading overlays, progress bars, status banners, and toast notifications. Updated documentation.
 - **Day 7**: Added user-friendly error, empty, and fallback states (`ErrorState`, `EmptyState`) to improve the frontend user experience. Updated documentation to reflect these changes.
+- **Day 8**: Frontend support — Worked on frontend integration and resolved UI and integration issues found during development.
 

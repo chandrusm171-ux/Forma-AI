@@ -1,6 +1,9 @@
-function SelectField({ field, register }) {
+function SelectField({ field, register, error }) {
+  const hasError = Boolean(error);
+  const errorMessage = typeof error === "string" ? error : error?.message;
+
   return (
-    <div className="form-field">
+    <div className={`form-field ${hasError ? "has-error" : ""}`}>
       <label htmlFor={field.name}>
         {field.label}
         {field.required && (
@@ -11,6 +14,8 @@ function SelectField({ field, register }) {
 
       <select
         id={field.name}
+        aria-invalid={hasError}
+        aria-describedby={hasError ? `${field.name}-error` : undefined}
         {...register(field.name, {
           required: field.required
             ? `${field.label} is required`
@@ -25,6 +30,12 @@ function SelectField({ field, register }) {
           </option>
         ))}
       </select>
+
+      {hasError && (
+        <p id={`${field.name}-error`} className="ui-input-error" role="alert">
+          {errorMessage}
+        </p>
+      )}
     </div>
   );
 }

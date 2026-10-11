@@ -40,6 +40,7 @@ Forma-AI/
 
 - [Project Structure & Roles](docs/Project_Structure.md)
 - [Frontend Structure & Component Guide](docs/Frontend.md)
+- [Backend Structure & Setup Guide](docs/Backend.md)
 
 ## Getting Started (Frontend)
 

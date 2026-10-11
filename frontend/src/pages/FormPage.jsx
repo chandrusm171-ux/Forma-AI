@@ -2,7 +2,7 @@ import { useState } from "react";
 import DynamicForm from "../components/forms/DynamicForm";
 import MagicInput from "../components/ai/MagicInput";
 import PageLayout from "../components/layout/PageLayout";
-import { Loading, Toast } from "../components/ui";
+import { Loading, Toast, EmptyState } from "../components/ui";
 import { insuranceClaimSchema } from "../schemas/formSchema";
 import { extractFormData } from "../services/aiService";
 
@@ -61,10 +61,17 @@ function FormPage() {
             />
           )}
 
-          <DynamicForm
-            schema={insuranceClaimSchema}
-            initialValues={prefillData}
-          />
+          {insuranceClaimSchema ? (
+            <DynamicForm
+              schema={insuranceClaimSchema}
+              initialValues={prefillData}
+            />
+          ) : (
+            <EmptyState
+              title="No Form Schema Available"
+              description="A valid form schema is required to display form fields."
+            />
+          )}
         </div>
       </div>
 
