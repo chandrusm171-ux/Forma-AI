@@ -1,4 +1,6 @@
-function TextField({ field, register }) {
+import Input from "../ui/Input";
+
+function TextField({ field, register, error }) {
   const validation = field.validation || {};
 
   const rules = {
@@ -31,19 +33,15 @@ function TextField({ field, register }) {
   }
 
   return (
-    <div className="form-field">
-      <label htmlFor={field.name}>
-        {field.label}
-        {field.required && <span> *</span>}
-      </label>
-
-      <input
-        id={field.name}
-        type="text"
-        placeholder={field.placeholder || ""}
-        {...register(field.name, rules)}
-      />
-    </div>
+    <Input
+      id={field.name}
+      label={field.label}
+      type="text"
+      placeholder={field.placeholder || ""}
+      required={field.required}
+      error={error}
+      {...register(field.name, rules)}
+    />
   );
 }
 

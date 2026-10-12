@@ -10,22 +10,31 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
 // API routes
 app.use("/api", routes);
 
+/*
+ * API Routes
+ */
+app.use("/api/health", healthRoutes);
+
+/*
+ * Root route
+ */
 app.get("/", (req, res) => {
   res.json({
-    message: "Forma-AI Backend is running"
+    message: "Forma-AI Backend is running",
   });
 });
 
-// Connect to MongoDB
 connectDB();
 
+/*
+ * Start server
+ */
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
