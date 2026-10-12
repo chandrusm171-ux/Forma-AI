@@ -19,7 +19,7 @@ app.use("/api", routes);
 /*
  * API Routes
  */
-app.use("/api/health", healthRoutes);
+
 
 /*
  * Root route
