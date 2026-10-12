@@ -1,36 +1,9 @@
+import { buildValidationRules } from "./validation";
+
 function TextareaField({ field, register, error }) {
-  const validation = field.validation || {};
   const hasError = Boolean(error);
   const errorMessage = typeof error === "string" ? error : error?.message;
-
-  const rules = {
-    required: field.required
-      ? `${field.label} is required`
-      : false,
-  };
-
-  if (validation.minLength) {
-    rules.minLength = {
-      value: validation.minLength,
-      message: `${field.label} must be at least ${validation.minLength} characters`,
-    };
-  }
-
-  if (validation.maxLength) {
-    rules.maxLength = {
-      value: validation.maxLength,
-      message: `${field.label} must not exceed ${validation.maxLength} characters`,
-    };
-  }
-
-  if (validation.pattern) {
-    rules.pattern = {
-      value: new RegExp(validation.pattern),
-      message:
-        validation.patternMessage ||
-        `${field.label} has an invalid format`,
-    };
-  }
+  const rules = buildValidationRules(field);
 
   return (
     <div className={`form-field ${hasError ? "has-error" : ""}`}>

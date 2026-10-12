@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Button from "../components/ui/Button";
-import { Loading, Toast, ProgressBar, EmptyState, ErrorState } from "../components/ui";
-import PageLayout from "../components/layout/PageLayout";
-import { parseResume } from "../services/aiService";
+import { Button, Loading, Toast, ProgressBar, EmptyState, ErrorState } from "../components/ui";
+import { PageLayout } from "../components/layout";
+import { parseResume } from "../services";
 
 /**
  * ResumePage – Resume parsing interface with loading, empty, and error states.

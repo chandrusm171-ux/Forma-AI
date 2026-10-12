@@ -22,6 +22,7 @@
 | **Day 6** | Loading States & User Feedback | Added and improved loading states, skeleton placeholders, progress bars, toast notifications, and inline status banners for all asynchronous frontend operations. Enhanced `MagicInput`, `DynamicForm`, `FormPage`, and `ResumePage` with comprehensive user feedback. |
 | **Day 7** | Error & Empty States | Added user-friendly error, empty, and fallback states (`ErrorState`, `EmptyState`) to improve the frontend user experience in edge cases (no data, API failure, etc.). Updated documentation. |
 | **Day 8** | Frontend support | Day 8 Update: Worked on frontend integration and resolved UI and integration issues found during development. |
+| **Day 9** | UI Refactoring | Refactored frontend components and improved code organization, readability, and maintainability. Centralized schema validation rules, added module barrel exports, eliminated redundant error states, and organized service layers. |
 
 ---
 
@@ -31,16 +32,16 @@
 src/
 ├── assets/          # Images and static files
 ├── components/
-│   ├── ai/          # MagicInput – AI natural-language prompt section
-│   ├── forms/       # DynamicForm, FieldRenderer, Input field wrappers
-│   ├── layout/      # Navbar (with mobile hamburger), PageLayout
-│   └── ui/          # Button, Input, Loading, Toast, Skeleton, ProgressBar
+│   ├── ai/          # MagicInput & barrel export (index.js)
+│   ├── forms/       # DynamicForm, FieldRenderer, field wrappers, validation.js & barrel export (index.js)
+│   ├── layout/      # Navbar, PageLayout & barrel export (index.js)
+│   └── ui/          # Button, Input, Loading, Toast, Skeleton, ProgressBar, EmptyState, ErrorState & index.js
 ├── pages/           # Home, FormPage, ResumePage
 ├── schemas/         # Form JSON schemas (e.g. formSchema.js)
-├── services/        # API and AI services (aiService.js)
+├── services/        # API, AI, and Form services (api.js, aiService.js, formService.js) & barrel export (index.js)
 ├── store/           # Zustand store (formStore.js)
 ├── App.jsx          # Root component with React Router routes
-├── App.css          # Vite default styles (unused by app pages)
+├── App.css          # Global styling additions
 ├── main.jsx         # Entry point – renders App into the DOM
 └── index.css        # Global styles, design tokens, responsive breakpoints
 ```
@@ -303,3 +304,31 @@ Provide frontend support by working on frontend integration and resolving UI and
 - **UI Issue Resolution**: Identified and resolved UI glitches across form fields, error states (`ErrorState`), empty states (`EmptyState`), loading overlays, and status banners.
 - **Component & State Flow Stability**: Verified seamless interaction between `formStore`, `react-hook-form`, and dynamic field renderers (`TextField`, `SelectField`, `TextareaField`, `CheckboxField`).
 - **Documentation**: Updated all project documentation (`Frontend.md`, `Project_Structure.md`, `README.md`) to reflect the Day 8 frontend support and integration milestones.
+
+---
+
+## Day 9 — UI Refactoring & Code Quality Improvements
+
+### Objective
+Refactor frontend components and improve code organization, readability, and maintainability across the component and service layers.
+
+### Key Refactorings & Enhancements
+1. **Centralized Form Validation Engine (`components/forms/validation.js`)**:
+   - Extracted duplicated validation rule parsing (required, minLength, maxLength, pattern) from individual field components (`TextField`, `TextareaField`, `SelectField`, `CheckboxField`) into a single, testable utility function `buildValidationRules(field)`.
+   - Reduced redundant boilerplate across form field wrappers and ensured consistent validation error messages.
+
+2. **Clean Barrel Exports (`index.js`)**:
+   - Added barrel index exports across submodules (`components/forms/index.js`, `components/ai/index.js`, `services/index.js`).
+   - Standardized component imports across pages (`Home.jsx`, `FormPage.jsx`, `ResumePage.jsx`), simplifying dependency graphs and increasing import readability.
+
+3. **Elimination of Duplicate Error Renderings**:
+   - Removed duplicate error message display in `DynamicForm.jsx` that was overlapping with field-level accessible error alerts in `SelectField`, `TextareaField`, and `CheckboxField`.
+   - Standardized error presentation to maintain single-source-of-truth rendering inside field components.
+
+4. **Defensive Conditional Logic**:
+   - Enhanced `ConditionalField.jsx` with optional chaining (`values?.[condition.field]`) to prevent runtime exceptions when evaluating complex multi-step condition paths.
+
+5. **Completed Service Layer (`services/formService.js`)**:
+   - Implemented `formService.js` to handle claim submission (`submitClaim`) and schema retrieval (`getSchema`) via Axios with graceful fallback for simulated environments.
+   - Unified API, AI, and form service entry points under `services/index.js`.
+

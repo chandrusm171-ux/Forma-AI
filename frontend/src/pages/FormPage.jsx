@@ -1,10 +1,10 @@
 import { useState } from "react";
-import DynamicForm from "../components/forms/DynamicForm";
-import MagicInput from "../components/ai/MagicInput";
-import PageLayout from "../components/layout/PageLayout";
+import { DynamicForm } from "../components/forms";
+import { MagicInput } from "../components/ai";
+import { PageLayout } from "../components/layout";
 import { Loading, Toast, EmptyState } from "../components/ui";
 import { insuranceClaimSchema } from "../schemas/formSchema";
-import { extractFormData } from "../services/aiService";
+import { extractFormData } from "../services";
 
 /**
  * FormPage – Main dynamic form page with AI-assisted prefill.
