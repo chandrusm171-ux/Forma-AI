@@ -1,7 +1,5 @@
-function TextareaField({ field, register, error }) {
+function TextareaField({ field, register }) {
   const validation = field.validation || {};
-  const hasError = Boolean(error);
-  const errorMessage = typeof error === "string" ? error : error?.message;
 
   const rules = {
     required: field.required
@@ -33,7 +31,7 @@ function TextareaField({ field, register, error }) {
   }
 
   return (
-    <div className={`form-field ${hasError ? "has-error" : ""}`}>
+    <div className="form-field">
       <label htmlFor={field.name}>
         {field.label}
         {field.required && (
@@ -46,16 +44,8 @@ function TextareaField({ field, register, error }) {
         id={field.name}
         rows="4"
         placeholder={field.placeholder || ""}
-        aria-invalid={hasError}
-        aria-describedby={hasError ? `${field.name}-error` : undefined}
         {...register(field.name, rules)}
       />
-
-      {hasError && (
-        <p id={`${field.name}-error`} className="ui-input-error" role="alert">
-          {errorMessage}
-        </p>
-      )}
     </div>
   );
 }
