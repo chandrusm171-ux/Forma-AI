@@ -1,48 +1,144 @@
 # Backend Setup and API Contract
 
-## Stack and folders
+## Stack & Technologies
 
-- Node.js + Express API
-- Mongoose + MongoDB Atlas
-- `config/db.js`: connects to MongoDB without terminating the HTTP server if Atlas is unavailable.
-- `controllers/healthController.js`: reports API and database state.
-- `models/`: form definitions and form submissions.
-- `routes/`: health, form, submission, and AI contract routes.
-- `utils/`: schema and submission payload validation.
-- `tests/`: Node's built-in test runner tests for validation utilities.
+- **Runtime**: Node.js
+- **Framework**: Express.js 5
+- **Database / ODM**: MongoDB with Mongoose 9 (supports Local MongoDB and MongoDB Atlas)
+- **CORS**: Configurable origin allowlist (`FRONTEND_ORIGIN`)
+- **Testing**: Node.js built-in test runner (`node --test`)
 
-## Setup
+---
+
+## Directory & File Structure
+
+```text
+backend/
+├── config/
+│   └── db.js                        # Connects to MongoDB with graceful error handling (won't crash HTTP server)
+├── controllers/
+│   └── healthController.js          # Health check reporting API status and DB connectivity
+├── middleware/
+│   └── requireDatabase.js           # Guard middleware returning 503 when MongoDB is not connected
+├── models/
+│   ├── Form.js                      # Schema & model for dynamic form definitions
+│   └── Submission.js                # Schema & model for persisted form responses
+├── routes/
+│   ├── index.js                     # Root API router (/api)
+│   ├── healthRoutes.js              # /api/health route
+│   ├── formRoutes.js                # /api/forms CRUD routes (protected by requireDatabase)
+│   ├── submissionRoutes.js          # /api/submissions routes (protected by requireDatabase)
+│   └── aiRoutes.js                  # /api/ai contract endpoints (extract, parse-resume)
+├── utils/
+│   ├── validateFormSchema.js        # Validates form schema structure, field types, and conditions
+│   └── validateSubmissionPayload.js # Validates submission payload (formId, formTitle, data)
+├── tests/
+│   └── validation.test.js           # Unit tests for schema and submission validators
+├── server.js                        # Express app initialization, middleware, error handlers, and port listener
+├── package.json                     # Dependencies & scripts
+├── .env.example                     # Environment template
+└── .env                             # Local environment variables (do not commit)
+```
+
+---
+
+## Environment Variables Configuration
+
+Create a `.env` file inside the `backend/` directory by copying `.env.example`:
 
 ```powershell
 cd backend
-npm install
 Copy-Item .env.example .env
 ```
 
-Set `MONGODB_URI` in `.env` to the URI copied from Atlas. Never commit `.env`. `FRONTEND_ORIGIN` is a comma-separated allowlist of frontend origins.
+### Environment Keys:
 
+| Key | Description | Example / Default |
+|---|---|---|
+| `PORT` | Port for the Express server to listen on | `5000` |
+| `MONGODB_URI` | MongoDB connection string (Local or Atlas) | `mongodb://127.0.0.1:27017/forma-ai` |
+| `FRONTEND_ORIGIN` | Comma-separated list of allowed frontend origins for CORS | `http://localhost:5173,http://127.0.0.1:5173` |
+
+### Sample `.env` Setup:
+
+#### 1. Local MongoDB:
+```env
+PORT=5000
+MONGODB_URI=mongodb://127.0.0.1:27017/forma-ai
+FRONTEND_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
+```
+
+#### 2. MongoDB Atlas (Cloud):
+```env
+PORT=5000
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/forma-ai?retryWrites=true&w=majority
+FRONTEND_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
+```
+
+> **Note:** Never commit the `.env` file to version control.
+
+---
+
+## Running the Backend
+
+### Install Dependencies:
+```powershell
+cd backend
+npm install
+```
+
+### Start in Development Mode (Nodemon):
 ```powershell
 npm run dev
+```
+
+### Start in Production Mode:
+```powershell
+npm start
+```
+
+### Run Validation Tests:
+```powershell
 npm test
 ```
 
-## API endpoints
+---
 
-| Method | Path | Behavior |
-|---|---|---|
-| GET | `/` | Basic server response |
-| GET | `/api/health` | API liveness and database readiness |
-| POST | `/api/forms` | Create a validated form schema |
-| GET | `/api/forms` | List saved form schemas |
-| GET | `/api/forms/:id` | Get a saved form schema |
-| DELETE | `/api/forms/:id` | Delete a saved form schema |
-| POST | `/api/submissions` | Persist a completed form submission |
-| GET | `/api/submissions/:id` | Retrieve a submission by ID |
-| POST | `/api/ai/extract` | Reserved endpoint; currently responds with `501 AI_SERVICE_NOT_CONFIGURED` |
-| POST | `/api/ai/parse-resume` | Reserved endpoint; currently responds with `501 AI_SERVICE_NOT_CONFIGURED` |
+## API Endpoints & Contract
 
-### Submission request
+| Method | Path | Middleware | Description | Success Code |
+|---|---|---|---|---|
+| **GET** | `/` | None | Basic server heartbeat | `200 OK` |
+| **GET** | `/api/health` | None | Reports API health and MongoDB connection status | `200 OK` |
+| **POST** | `/api/forms` | `requireDatabase` | Creates a validated dynamic form schema | `201 Created` |
+| **GET** | `/api/forms` | `requireDatabase` | Retrieves list of all saved forms | `200 OK` |
+| **GET** | `/api/forms/:id` | `requireDatabase` | Retrieves a specific form schema by its ID | `200 OK` |
+| **DELETE** | `/api/forms/:id` | `requireDatabase` | Deletes a form schema by its ID | `200 OK` |
+| **POST** | `/api/submissions` | `requireDatabase` | Validates and persists a completed form submission | `201 Created` |
+| **GET** | `/api/submissions/:id` | `requireDatabase` | Retrieves a form submission by its ID | `200 OK` |
+| **POST** | `/api/ai/extract` | None | AI field extraction from natural language (contract placeholder) | `501 Not Implemented` |
+| **POST** | `/api/ai/parse-resume` | None | AI resume parsing endpoint (contract placeholder) | `501 Not Implemented` |
 
+---
+
+## Detailed Payload Specifications
+
+### 1. Health Status (`GET /api/health`)
+Returns `status: "ready"` when MongoDB is connected, and `status: "degraded"` when the server is alive but MongoDB is disconnected.
+
+```json
+{
+  "success": true,
+  "status": "ready",
+  "service": "Forma-AI API",
+  "database": "connected",
+  "message": "API and database are ready",
+  "timestamp": "2026-10-14T02:40:00.000Z"
+}
+```
+
+### 2. Create Form Submission (`POST /api/submissions`)
+**Request Body:**
 ```json
 {
   "formId": "insurance-claim",
@@ -55,18 +151,55 @@ npm test
 }
 ```
 
-The API responds with HTTP `201` and a generated submission ID when MongoDB is connected. If MongoDB is disconnected, it returns HTTP `503` and does not claim that the submission was saved.
+**Success Response (`201 Created`):**
+```json
+{
+  "success": true,
+  "message": "Form submission saved successfully",
+  "data": {
+    "id": "670c7913e8b09088ab123456",
+    "formId": "insurance-claim",
+    "formTitle": "Insurance Claim Form",
+    "createdAt": "2026-10-14T02:45:00.000Z"
+  }
+}
+```
 
-### Health response
+**Database Disconnected Response (`503 Service Unavailable`):**
+```json
+{
+  "success": false,
+  "code": "DATABASE_UNAVAILABLE",
+  "message": "The database is not connected. Please try again later."
+}
+```
 
-`GET /api/health` returns `status: "ready"` when the database is connected and `status: "degraded"` when the HTTP API is running but MongoDB is unavailable. This keeps the health badge from confusing API availability with database readiness.
+### 3. AI Extraction Handoff (`POST /api/ai/extract`)
+The frontend sends:
+```json
+{
+  "text": "My car was hit from behind on Main Street yesterday.",
+  "schemaId": "insurance-claim"
+}
+```
+*Current Behavior*: Returns HTTP `501` with code `AI_SERVICE_NOT_CONFIGURED` until the LangChain / LLM provider integration is wired up.
 
-### AI integration handoff
+### 4. AI Resume Parser Handoff (`POST /api/ai/parse-resume`)
+Uses `multipart/form-data` with the file field named `resume`.
+*Current Behavior*: Returns HTTP `501` with code `AI_SERVICE_NOT_CONFIGURED` until parsing logic is implemented.
 
-The frontend now calls `/api/ai/extract` with `{ "text": "...", "schemaId": "insurance-claim" }`. The AI implementation owner should replace the current `501` handler with the LangChain/LLM provider, validate its structured output against the selected schema, and return `{ "success": true, "data": { ...fieldValues } }`.
+---
 
-Resume parsing uses multipart form data with the file field name `resume` at `/api/ai/parse-resume`. The route is a placeholder until the parser and upload limits are implemented.
+## Error Handling & Resilience
+- **Database Independence**: The server connects to MongoDB using `connectDB()`, which catches connection errors without killing the Node process. This ensures `/api/health` stays functional even when MongoDB is offline.
+- **Database Guard**: Database-dependent routes use `requireDatabase` middleware to prevent unhandled promise rejections and return an explicit `503 DATABASE_UNAVAILABLE`.
+- **JSON & Body Guard**: Malformed JSON triggers a `400 Bad Request` and payloads exceeding 1MB trigger a `413 Request body is too large`.
+- **404 Handler**: Catches any unmapped API endpoints.
 
-## Security status
+---
 
-This is a development MVP without authentication or role-based access control. Before deployment, add authorization, rate limiting, request audit policy, data retention rules, and appropriate handling of sensitive submissions. Do not disable TLS certificate verification to work around MongoDB connectivity issues.
+## Security & Production Readiness
+This project is currently in the development MVP phase:
+- Add JWT or session-based authentication before deploying to production.
+- Add rate limiting (e.g. `express-rate-limit`) on sensitive submission and AI endpoints.
+- Configure proper TLS verification and keep connection credentials in environment variables only.

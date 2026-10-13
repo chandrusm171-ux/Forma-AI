@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Button from "../components/ui/Button";
-import { Loading, Toast, ProgressBar } from "../components/ui";
-import PageLayout from "../components/layout/PageLayout";
+import {
+  Button,
+  Loading,
+  Toast,
+  ProgressBar,
+  PageLayout,
+} from "../components";
 import { parseResume } from "../services/aiService";
 
 /**
