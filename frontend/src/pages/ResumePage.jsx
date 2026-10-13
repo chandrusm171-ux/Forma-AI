@@ -1,19 +1,25 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../components/ui/Button";
-import { Loading, Toast, ProgressBar, EmptyState, ErrorState } from "../components/ui";
+import { Loading, Toast, ProgressBar } from "../components/ui";
 import PageLayout from "../components/layout/PageLayout";
 import { parseResume } from "../services/aiService";
 
 /**
- * ResumePage – Resume parsing interface with loading, empty, and error states.
+ * ResumePage – Resume parsing interface with loading states.
+ *
+ * Day 6 enhancements:
+ * - Parsing button shows a spinner via isLoading while the resume is being processed.
+ * - An indeterminate progress bar appears during parsing for visual feedback.
+ * - A Loading overlay covers the upload card while processing.
+ * - Parsed results are displayed in a structured card.
+ * - Toast notifications provide success/error feedback.
  */
 function ResumePage() {
   const [fileName, setFileName] = useState("");
   const [file, setFile] = useState(null);
   const [isParsing, setIsParsing] = useState(false);
   const [parsedData, setParsedData] = useState(null);
-  const [parseError, setParseError] = useState(null);
   const [toast, setToast] = useState({ visible: false, type: "info", message: "" });
 
   const showToast = (type, message) => {
@@ -29,7 +35,6 @@ function ResumePage() {
     setFileName(selectedFile ? selectedFile.name : "");
     setFile(selectedFile || null);
     setParsedData(null); // clear previous results
-    setParseError(null);
   };
 
   const handleParse = async () => {
@@ -37,7 +42,6 @@ function ResumePage() {
 
     setIsParsing(true);
     setParsedData(null);
-    setParseError(null);
 
     try {
       const result = await parseResume(file);
@@ -45,9 +49,7 @@ function ResumePage() {
       showToast("success", `Resume "${file.name}" parsed successfully.`);
     } catch (error) {
       console.error("Resume parsing failed:", error);
-      const errMsg = error?.message || "Failed to parse resume. Please try again.";
-      setParseError(errMsg);
-      showToast("error", errMsg);
+      showToast("error", error?.message || "Failed to parse resume. Please try again.");
     } finally {
       setIsParsing(false);
     }
@@ -121,16 +123,6 @@ function ResumePage() {
           </div>
         </div>
 
-        {/* ── Error state ── */}
-        {parseError && (
-          <ErrorState
-            title="Resume Parsing Failed"
-            description={parseError}
-            retryLabel="Retry Parsing"
-            onRetry={handleParse}
-          />
-        )}
-
         {/* ── Parsed results card ── */}
         {parsedData && (
           <div className="resume-results-card" role="region" aria-label="Parsed resume results">
@@ -163,14 +155,6 @@ function ResumePage() {
               </div>
             </div>
           </div>
-        )}
-
-        {/* ── Empty state when nothing is parsed yet ── */}
-        {!parsedData && !parseError && !isParsing && (
-          <EmptyState
-            title="No resume parsed yet"
-            description="Select a resume file above and click 'Parse Resume' to preview structured candidate information."
-          />
         )}
       </section>
 
