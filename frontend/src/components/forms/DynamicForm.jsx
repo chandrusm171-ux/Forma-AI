@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import FieldRenderer from "./FieldRenderer";
 import ConditionalField from "./ConditionalField";
-import Button from "../ui/Button";
+import { Button } from "../ui";
 
 /**
  * DynamicForm – Renders a form from a JSON schema.
@@ -93,16 +93,12 @@ function DynamicForm({ schema, initialValues = {} }) {
       <fieldset disabled={isSubmitting} className="form-fieldset">
         {schema.fields.map((field) => (
           <ConditionalField key={field.name} field={field} values={values}>
-            <div>
+            <div className="form-field-wrapper">
               <FieldRenderer
                 field={field}
                 register={register}
                 error={errors[field.name]}
               />
-
-              {field.type !== "text" && errors[field.name] && (
-                <p className="error-message">{errors[field.name].message}</p>
-              )}
             </div>
           </ConditionalField>
         ))}

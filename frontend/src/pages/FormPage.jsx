@@ -4,7 +4,7 @@ import MagicInput from "../components/ai/MagicInput";
 import PageLayout from "../components/layout/PageLayout";
 import { Loading, Toast } from "../components/ui";
 import { insuranceClaimSchema } from "../schemas/formSchema";
-import { extractFormData } from "../services/aiService";
+import { extractFormData } from "../services";
 
 /**
  * FormPage – Main dynamic form page with AI-assisted prefill.

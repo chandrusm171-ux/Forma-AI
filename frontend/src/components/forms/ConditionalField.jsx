@@ -6,7 +6,7 @@ function ConditionalField({ field, values, children }) {
     return children;
   }
 
-  const currentValue = values[condition.field];
+  const currentValue = values?.[condition.field];
 
   switch (condition.operator) {
     case "equals":

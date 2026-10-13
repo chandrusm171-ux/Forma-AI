@@ -1,6 +1,5 @@
 import { useState } from "react";
-import Button from "../ui/Button";
-import ProgressBar from "../ui/ProgressBar";
+import { Button, ProgressBar } from "../ui";
 
 /**
  * MagicInput – AI Natural Language Input Section

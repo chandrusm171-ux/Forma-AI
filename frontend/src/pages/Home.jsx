@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import Button from "../components/ui/Button";
-import PageLayout from "../components/layout/PageLayout";
+import { Button } from "../components/ui";
+import { PageLayout } from "../components/layout";
 
 const features = [
   {
