@@ -47,3 +47,4 @@ Forma-AI/
 - **Day 8**: Frontend support — Worked on frontend integration and resolved UI and integration issues found during development.
 - **Day 9**: UI refactoring — Refactored frontend components and improved code organization, readability, and maintainability. Centralized schema validation rules, added module barrel exports, eliminated redundant error states, and organized service layers.
 
+- **Day 10**: Fixed select/textarea/checkbox validation feedback, aligned the frontend form service with backend routes, added persisted form submissions and API/database-aware health reporting, established explicit AI endpoint contracts, and added backend validation tests.

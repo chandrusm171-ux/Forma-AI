@@ -3,9 +3,10 @@ function CheckboxField({ field, register, error }) {
   const errorMessage = typeof error === "string" ? error : error?.message;
 
   return (
-    <div className="form-field checkbox-field">
-      <label>
+    <div className={`form-field checkbox-field ${hasError ? "has-error" : ""}`}>
+      <label htmlFor={field.name}>
         <input
+          id={field.name}
           type="checkbox"
           aria-invalid={hasError}
           aria-describedby={hasError ? `${field.name}-error` : undefined}
@@ -15,9 +16,14 @@ function CheckboxField({ field, register, error }) {
               : false,
           })}
         />
-
         <span>{field.label}</span>
       </label>
+
+      {hasError && (
+        <p id={`${field.name}-error`} className="ui-input-error" role="alert">
+          {errorMessage}
+        </p>
+      )}
     </div>
   );
 }
