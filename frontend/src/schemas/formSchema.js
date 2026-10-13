@@ -71,6 +71,7 @@ export const insuranceClaimSchema = {
       name: "hasDamage",
       type: "checkbox",
       label: "Was the vehicle damaged?",
+      required: false,
     },
 
     {

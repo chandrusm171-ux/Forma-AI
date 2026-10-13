@@ -3,6 +3,7 @@ import { useForm, useWatch } from "react-hook-form";
 import FieldRenderer from "./FieldRenderer";
 import ConditionalField from "./ConditionalField";
 import { Button } from "../ui";
+import { formService } from "../../services/formService";
 
 /**
  * DynamicForm – Renders a form from a JSON schema.
@@ -25,6 +26,7 @@ function DynamicForm({ schema, initialValues = {} }) {
 
   const values = useWatch({ control });
   const [submitStatus, setSubmitStatus] = useState(null); // null | 'success' | 'error'
+  const [submitMessage, setSubmitMessage] = useState("");
 
   useEffect(() => {
     if (Object.keys(initialValues).length > 0) {
@@ -34,18 +36,34 @@ function DynamicForm({ schema, initialValues = {} }) {
 
   const onSubmit = async (data) => {
     setSubmitStatus(null);
+    setSubmitMessage("");
+
     try {
-      // Simulate async form submission
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log("Form submitted:", data);
+      const result = await formService.submitSubmission({
+        formId: schema.id,
+        formTitle: schema.title,
+        data,
+      });
       setSubmitStatus("success");
+      setSubmitMessage(
+        result?.id
+          ? `Your response was saved. Reference ID: ${result.id}`
+          : "Your response was saved successfully."
+      );
     } catch (error) {
       console.error("Submission failed:", error);
       setSubmitStatus("error");
+      setSubmitMessage(
+        error.response?.data?.message || error.message ||
+        "Submission failed. Please try again."
+      );
     }
   };
 
-  const dismissStatus = () => setSubmitStatus(null);
+  const dismissStatus = () => {
+    setSubmitStatus(null);
+    setSubmitMessage("");
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -74,11 +92,7 @@ function DynamicForm({ schema, initialValues = {} }) {
               </svg>
             )}
           </span>
-          <p>
-            {submitStatus === "success"
-              ? "Claim submitted successfully!"
-              : "Submission failed. Please try again."}
-          </p>
+          <p>{submitMessage}</p>
           <button
             type="button"
             className="form-submit-status-dismiss"
@@ -111,7 +125,7 @@ function DynamicForm({ schema, initialValues = {} }) {
           size="md"
           isLoading={isSubmitting}
         >
-          {isSubmitting ? "Submitting…" : "Submit Claim"}
+          {isSubmitting ? "Saving…" : "Submit Form"}
         </Button>
       </div>
     </form>

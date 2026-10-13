@@ -34,8 +34,10 @@ function Navbar({ brandName = "Forma AI" }) {
       try {
         const health = await checkBackendHealth();
 
-        if (isMounted && health?.success) {
+        if (isMounted && health?.success && health.database === "connected") {
           setBackendStatus("connected");
+        } else if (isMounted && health?.success) {
+          setBackendStatus("degraded");
         } else if (isMounted) {
           setBackendStatus("offline");
         }
@@ -73,6 +75,14 @@ function Navbar({ brandName = "Forma AI" }) {
       dotStyle: undefined,
     },
 
+    degraded: {
+      label: "API Online · DB Offline",
+      className: "status-pill",
+      dotStyle: {
+        background: "#f59e0b",
+      },
+    },
+
     offline: {
       label: "Backend Offline",
       className: "status-pill",
@@ -92,7 +102,13 @@ function Navbar({ brandName = "Forma AI" }) {
               color: "#dc2626",
               border: "1px solid #fecaca",
             }
-          : backendStatus === "checking"
+          : backendStatus === "degraded"
+            ? {
+                background: "#fffbeb",
+                color: "#b45309",
+                border: "1px solid #fde68a",
+              }
+            : backendStatus === "checking"
             ? {
                 background: "#fffbeb",
                 color: "#b45309",

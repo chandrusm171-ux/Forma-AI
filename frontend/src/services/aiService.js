@@ -1,66 +1,66 @@
-/**
- * AI Service – handles AI-related API calls.
- *
- * All functions include a simulated network delay so that loading states
- * and user-feedback components can be observed during development.
- * These stubs will be replaced with real backend API calls once the
- * extraction endpoint is available.
- */
+import api from "./api";
 
-/**
- * Simulates a network delay for development/testing.
- * @param {number} ms – Delay duration in milliseconds.
- * @returns {Promise<void>}
- */
-function delay(ms = 1500) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function getResponseData(response) {
+  return response.data?.data ?? response.data;
+}
+
+function getApiErrorMessage(error, fallback) {
+  return error.response?.data?.message || error.message || fallback;
 }
 
 /**
- * Extracts structured form data from a natural-language story.
- *
- * @param {string} story – The user's plain-text incident description.
- * @returns {Promise<Object>} Extracted key-value pairs matching the form schema.
- * @throws {Error} If the input is empty or extraction fails.
+ * Ask the backend AI integration to extract values for the selected schema.
+ * The backend currently returns AI_SERVICE_NOT_CONFIGURED until the LangChain
+ * provider is implemented. This service intentionally does not fabricate data.
  */
-export async function extractFormData(story) {
-  if (!story || !story.trim()) {
+export async function extractFormData(story, schemaId = "insurance-claim") {
+  if (typeof story !== "string" || !story.trim()) {
     throw new Error("Please provide a description before analysing.");
   }
 
-  // Simulate network latency (will be removed when real API is connected)
-  await delay(2000);
-
-  return {
-    fullName: "John Doe",
-    incidentType: "animal_collision",
-    vehicle: "Honda City",
-    description: story,
-    hasDamage: true,
-    damageDescription: "The windshield was damaged.",
-  };
+  try {
+    const response = await api.post("/ai/extract", {
+      text: story.trim(),
+      schemaId,
+    });
+    return getResponseData(response);
+  } catch (error) {
+    throw new Error(
+      getApiErrorMessage(error, "AI extraction failed. Please try again."),
+      { cause: error }
+    );
+  }
 }
 
-/**
- * Parses a resume file and returns structured candidate data.
- *
- * @param {File} file – The uploaded resume file.
- * @returns {Promise<Object>} Parsed resume data.
- * @throws {Error} If no file is provided or parsing fails.
- */
+/** Send a resume file to the backend parser when that endpoint is implemented. */
 export async function parseResume(file) {
-  if (!file) {
-    throw new Error("No file provided for parsing.");
+  if (!(file instanceof File)) {
+    throw new Error("Please select a resume file before parsing.");
   }
 
-  // Simulate network latency (will be removed when real API is connected)
-  await delay(2500);
+  const allowedTypes = ["application/pdf"];
+  const allowedExtensions = /\.(pdf|doc|docx)$/i;
+  if (!allowedTypes.includes(file.type) && !allowedExtensions.test(file.name)) {
+    throw new Error("Please select a PDF, DOC, or DOCX resume.");
+  }
 
-  return {
-    name: "Extracted Candidate Name",
-    email: "candidate@example.com",
-    skills: ["JavaScript", "React", "Node.js"],
-    experience: "3 years",
-    fileName: file.name,
-  };
+  if (file.size > 10 * 1024 * 1024) {
+    throw new Error("Resume files must be 10 MB or smaller.");
+  }
+
+  const body = new FormData();
+  body.append("resume", file);
+
+  try {
+    const response = await api.post("/ai/parse-resume", body, {
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 60000,
+    });
+    return getResponseData(response);
+  } catch (error) {
+    throw new Error(
+      getApiErrorMessage(error, "Resume parsing failed. Please try again."),
+      { cause: error }
+    );
+  }
 }

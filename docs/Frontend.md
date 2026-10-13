@@ -333,3 +333,14 @@ Refactor frontend components and improve code organization, readability, and mai
    - Implemented `formService.js` to handle claim submission (`submitClaim`) and schema retrieval (`getSchema`) via Axios with graceful fallback for simulated environments.
    - Unified API, AI, and form service entry points under `services/index.js`.
 
+
+---
+
+## Day 10 — API Integration and Form Validation Fixes
+
+- Fixed the select field's undefined `hasError` reference that caused a runtime error when rendering select inputs.
+- Standardized validation rules across text, email, select, textarea, and checkbox fields, and displayed validation errors accessibly.
+- Connected form submission to `POST /api/submissions`; removed the fake success response so the UI reports database/API errors honestly.
+- Replaced hard-coded AI extraction and resume parsing results with calls to the backend AI API contract. The endpoints intentionally return `501` until the AI provider/parser implementation is completed.
+- Updated the navbar health indicator to distinguish a running API from an unavailable MongoDB connection.
+- Added backend schema/submission validation tests and documented local setup and API contracts.

@@ -2,10 +2,12 @@
 
 
 const express = require("express");
-const router = express.Router();
-
 const Form = require("../models/Form");
+const requireDatabase = require("../middleware/requireDatabase");
 const validateFormSchema = require("../utils/validateFormSchema");
+
+const router = express.Router();
+router.use(requireDatabase);
 
 // POST /api/forms - Create a new form
 router.post("/", async (req, res) => {
