@@ -1,3 +1,8 @@
+import { buildValidationRules } from "./validation";
+
+/**
+ * CheckboxField component for boolean/consent form inputs.
+ */
 function CheckboxField({ field, register, error }) {
   const hasError = Boolean(error);
   const errorMessage = typeof error === "string" ? error : error?.message;
@@ -10,11 +15,7 @@ function CheckboxField({ field, register, error }) {
           type="checkbox"
           aria-invalid={hasError}
           aria-describedby={hasError ? `${field.name}-error` : undefined}
-          {...register(field.name, {
-            required: field.required
-              ? `${field.label} is required`
-              : false,
-          })}
+          {...register(field.name, buildValidationRules(field))}
         />
         <span>{field.label}</span>
       </label>

@@ -1,8 +1,11 @@
 import { useState } from "react";
-import DynamicForm from "../components/forms/DynamicForm";
-import MagicInput from "../components/ai/MagicInput";
-import PageLayout from "../components/layout/PageLayout";
-import { Loading, Toast } from "../components/ui";
+import {
+  DynamicForm,
+  MagicInput,
+  PageLayout,
+  Loading,
+  Toast,
+} from "../components";
 import { insuranceClaimSchema } from "../schemas/formSchema";
 import { extractFormData } from "../services";
 

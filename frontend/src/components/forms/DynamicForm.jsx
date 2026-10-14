@@ -3,7 +3,7 @@ import { useForm, useWatch } from "react-hook-form";
 import FieldRenderer from "./FieldRenderer";
 import ConditionalField from "./ConditionalField";
 import { Button } from "../ui";
-import { formService } from "../../services/formService";
+import { formService } from "../../services";
 
 /**
  * DynamicForm – Renders a form from a JSON schema.
