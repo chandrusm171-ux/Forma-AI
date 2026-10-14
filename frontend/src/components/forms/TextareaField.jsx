@@ -3,33 +3,47 @@ import { buildValidationRules } from "./validation";
 function TextareaField({ field, register, error }) {
   const hasError = Boolean(error);
   const errorMessage = typeof error === "string" ? error : error?.message;
+  const helper = field.helperText || field.description;
 
   return (
-    <div className={`form-field ${hasError ? "has-error" : ""}`}>
-      <label htmlFor={field.name}>
+    <div className={`ui-input-wrapper form-field ${hasError ? "has-error" : ""}`}>
+      <label htmlFor={field.name} className="ui-input-label">
         {field.label}
         {field.required && (
-          <span
-            style={{ color: "var(--color-danger)", marginLeft: "2px" }}
-            aria-hidden="true"
-          >
-            *
+          <span className="ui-required-mark" aria-hidden="true">
+            {" "}*
           </span>
         )}
       </label>
 
-      <textarea
-        id={field.name}
-        rows={4}
-        placeholder={field.placeholder || ""}
-        aria-invalid={hasError}
-        aria-describedby={hasError ? `${field.name}-error` : undefined}
-        {...register(field.name, buildValidationRules(field))}
-      />
+      <div className="ui-input-container">
+        <textarea
+          id={field.name}
+          rows={4}
+          disabled={field.disabled}
+          placeholder={field.placeholder || ""}
+          className="ui-input-field ui-textarea-field"
+          aria-invalid={hasError}
+          aria-describedby={
+            hasError
+              ? `${field.name}-error`
+              : helper
+              ? `${field.name}-helper`
+              : undefined
+          }
+          {...register(field.name, buildValidationRules(field))}
+        />
+      </div>
 
       {hasError && (
         <p id={`${field.name}-error`} className="ui-input-error" role="alert">
           {errorMessage}
+        </p>
+      )}
+
+      {!hasError && helper && (
+        <p id={`${field.name}-helper`} className="ui-input-helper">
+          {helper}
         </p>
       )}
     </div>

@@ -118,7 +118,7 @@ function DynamicForm({ schema, initialValues = {} }) {
         ))}
       </fieldset>
 
-      <div style={{ marginTop: "24px" }}>
+      <div className="form-submit-actions">
         <Button
           type="submit"
           variant="primary"

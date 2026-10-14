@@ -50,26 +50,37 @@ function FormPage() {
   };
 
   return (
-    <PageLayout>
-      <div className="form-page-layout">
-        <MagicInput onAnalyze={handleAnalyze} />
-
-        {/* ── Form section with loading overlay ── */}
-        <div className="form-section-wrapper">
-          {isExtracting && (
-            <Loading
-              overlay
-              size="lg"
-              text="Extracting form data from your description…"
-            />
-          )}
-
-          <DynamicForm
-            schema={insuranceClaimSchema}
-            initialValues={prefillData}
-          />
+    <PageLayout maxWidth="960px">
+      <section className="form-page" aria-labelledby="form-page-title">
+        <div className="form-page-header">
+          <span className="home-eyebrow">DYNAMIC FORM ENGINE</span>
+          <h1 id="form-page-title">Insurance Claim Form</h1>
+          <p>
+            Describe your incident in natural language to let AI prefill the
+            details, or fill out and verify the structured form below.
+          </p>
         </div>
-      </div>
+
+        <div className="form-page-layout">
+          <MagicInput onAnalyze={handleAnalyze} />
+
+          {/* ── Form section with loading overlay ── */}
+          <div className="form-section-wrapper">
+            {isExtracting && (
+              <Loading
+                overlay
+                size="lg"
+                text="Extracting form data from your description…"
+              />
+            )}
+
+            <DynamicForm
+              schema={insuranceClaimSchema}
+              initialValues={prefillData}
+            />
+          </div>
+        </div>
+      </section>
 
       {/* ── Global toast feedback ── */}
       <Toast

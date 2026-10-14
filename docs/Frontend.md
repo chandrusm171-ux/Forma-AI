@@ -25,6 +25,7 @@
 | **Day 9** | Frontend quality checks | Removed unused React imports, fixed toast visibility/dismissal lifecycle, and verified ESLint passes. |
 | **Day 9** | UI Refactoring | Refactored frontend components and improved code organization, readability, and maintainability. Centralized schema validation rules, added module barrel exports, eliminated redundant error states, and organized service layers. |
 | **Day 10** | UI Refactoring | Day 10 Update: Refactored frontend components and improved code organization, readability and maintainability. Added root barrel exports (`components/index.js`, `pages/index.js`), standardized clean component imports across all pages, streamlined validation rules in checkbox fields, and documented component architecture. |
+| **Day 11** | UI Consistency | Day 11 Update: Improved consistency across pages, components, buttons, forms and user interactions. Standardized page headers and semantic landmarks across Home, FormPage, and ResumePage. Unified button hover, elevation, and active states across all variants. Aligned form field wrappers (SelectField, TextareaField, CheckboxField) with the Input UI primitive including required indicators, helper text, and accessible error styling. Polished dismiss buttons and form submission actions. |
 
 ---
 
@@ -377,4 +378,41 @@ Day 10 Update: Refactored frontend components and improved code organization, re
 - Replaced hard-coded AI extraction and resume parsing results with calls to the backend AI API contract. The endpoints intentionally return `501` until the AI provider/parser implementation is completed.
 - Updated the navbar health indicator to distinguish a running API from an unavailable MongoDB connection.
 - Added backend schema/submission validation tests and documented local setup and API contracts.
+
+---
+
+## Day 11 — UI Consistency & Interaction Polish (Frontend)
+
+### Objective
+Day 11 Update: Improved consistency across pages, components, buttons, forms and user interactions across the entire Forma AI frontend application.
+
+### Key Refactorings & Enhancements
+
+1. **Cross-Page Structure & Semantic Consistency**:
+   - **Unified Page Header Hierarchy**: Added `<div className="form-page-header">` to `FormPage.jsx` with the signature `.home-eyebrow` badge (`DYNAMIC FORM ENGINE`), an `<h1>` heading (`Insurance Claim Form`), and a descriptive subtitle.
+   - **Accessible Semantic Landmarks**: Standardized page landmarks across all three application views (`Home.jsx`, `FormPage.jsx`, `ResumePage.jsx`) using `<section className="[page]-page" aria-labelledby="[id]">`.
+   - **Strict Heading Hierarchy**: Ensured every page enforces a single `<h1>` tag with proper heading hierarchy (`h1` → `h2` → `h3`), complying with SEO and accessibility best practices.
+   - **Consistent Viewport Width Constraints**: Aligned `PageLayout` max-width constraints and vertical section spacing (`gap: var(--space-6)`) across all views.
+
+2. **Form Components & Field Standardization**:
+   - **Unified Wrapper & Label Architecture**: Aligned `SelectField.jsx` and `TextareaField.jsx` with `Input.jsx` by adopting `.ui-input-wrapper`, `.ui-input-label`, and `.ui-input-container` wrapper structures.
+   - **Standardized Required Indicators**: Replaced ad-hoc inline styles with the design-token-backed `.ui-required-mark` CSS class across all text, select, textarea, and checkbox fields.
+   - **Comprehensive Helper Text Support**: Extended `field.helperText` and `field.description` support across `SelectField`, `TextareaField`, and `CheckboxField`, rendering `<p className="ui-input-helper">` dynamically.
+   - **Accessible Error Describers**: Synchronized `aria-invalid` and `aria-describedby` across all field components, pointing cleanly to either `${field.name}-error` when invalid or `${field.name}-helper` when valid.
+   - **Consistent Disabled Handling**: Passed `disabled={field.disabled}` to select, textarea, and checkbox controls to match text inputs.
+
+3. **Complete Form Field Error Styling (`index.css`)**:
+   - Extended `.has-error` state styling in `index.css` beyond text inputs to include `select`, `textarea`, `.ui-select-field`, `.ui-textarea-field`, and `.checkbox-field label`.
+   - Applied identical danger borders (`var(--color-danger)`), soft danger backgrounds (`#fff5f5`), and accessible error focus rings (`box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18)`).
+   - Styled `.checkbox-field.has-error label` with danger borders and hover tints for clear visual feedback.
+
+4. **Button & Interaction Polish**:
+   - **Unified Interactive Feedback**: Added smooth hover elevations (`transform: translateY(-1px)`), contextual box-shadows, and active-state resets (`transform: translateY(0)`) across all button variants (`secondary`, `outline`, `ghost`, `danger`) to match `primary`.
+   - **Standardized Button Actions on ResumePage**: Upgraded the "Open Dynamic Form" navigation link in `ResumePage.jsx` to use the reusable `Button` primitive (`variant="outline"`), matching the button ergonomics of `Home.jsx`.
+   - **Mobile Action Stacking**: Ensured button action containers stretch and stack consistently on mobile viewports without overflowing.
+
+5. **User Feedback & Dismiss Controls**:
+   - **Interactive Dismiss Buttons**: Polished `.form-submit-status-dismiss`, `.magic-status-dismiss`, and `.ui-toast-close` with subtle hover scaling (`scale(1.1)`), rounded corners, `:focus-visible` accessibility rings, and explicit `type="button"` attributes.
+   - **Form Submission Actions**: Replaced inline margins in `DynamicForm.jsx` with a dedicated `.form-submit-actions` class.
+
 

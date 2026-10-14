@@ -79,6 +79,7 @@ function MagicInput({ onAnalyze }) {
           </span>
           <p className="magic-status-message">{status.message}</p>
           <button
+            type="button"
             className="magic-status-dismiss"
             onClick={dismissStatus}
             aria-label="Dismiss message"

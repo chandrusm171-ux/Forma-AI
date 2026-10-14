@@ -122,7 +122,9 @@ function ResumePage() {
               {isParsing ? "Parsing…" : "Parse Resume"}
             </Button>
             <Link to="/form" className="resume-back-link">
-              Open Dynamic Form
+              <Button type="button" variant="outline" size="md">
+                Open Dynamic Form
+              </Button>
             </Link>
           </div>
         </div>
