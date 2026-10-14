@@ -14,10 +14,12 @@
 
 ```text
 backend/
+├── app.js                          # Express app setup, middleware, error handlers and routes
 ├── config/
 │   └── db.js                        # Connects to MongoDB with graceful error handling (won't crash HTTP server)
 ├── controllers/
-│   └── healthController.js          # Health check reporting API status and DB connectivity
+│   ├── healthController.js          # Liveness status and DB connectivity
+│   └── readinessController.js       # Readiness check (503 when MongoDB is disconnected)
 ├── middleware/
 │   └── requireDatabase.js           # Guard middleware returning 503 when MongoDB is not connected
 ├── models/
@@ -33,8 +35,9 @@ backend/
 │   ├── validateFormSchema.js        # Validates form schema structure, field types, and conditions
 │   └── validateSubmissionPayload.js # Validates submission payload (formId, formTitle, data)
 ├── tests/
+│   ├── api.test.js                  # HTTP smoke tests for health, readiness, malformed JSON and 404s
 │   └── validation.test.js           # Unit tests for schema and submission validators
-├── server.js                        # Express app initialization, middleware, error handlers, and port listener
+├── server.js                        # Starts HTTP server, connects/retries MongoDB, handles shutdown
 ├── package.json                     # Dependencies & scripts
 ├── .env.example                     # Environment template
 └── .env                             # Local environment variables (do not commit)
@@ -58,6 +61,7 @@ Copy-Item .env.example .env
 | `PORT` | Port for the Express server to listen on | `5000` |
 | `MONGODB_URI` | MongoDB connection string (Local or Atlas) | `mongodb://127.0.0.1:27017/forma-ai` |
 | `FRONTEND_ORIGIN` | Comma-separated list of allowed frontend origins for CORS | `http://localhost:5173,http://127.0.0.1:5173` |
+| `DB_RETRY_INTERVAL_MS` | Delay between retries after an initial Atlas connection failure (minimum 5000 ms) | `15000` |
 
 ### Sample `.env` Setup:
 
@@ -66,6 +70,7 @@ Copy-Item .env.example .env
 PORT=5000
 MONGODB_URI=mongodb://127.0.0.1:27017/forma-ai
 FRONTEND_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
+DB_RETRY_INTERVAL_MS=15000
 ```
 
 #### 2. MongoDB Atlas (Cloud):
@@ -73,6 +78,7 @@ FRONTEND_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
 PORT=5000
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/forma-ai?retryWrites=true&w=majority
 FRONTEND_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
+DB_RETRY_INTERVAL_MS=15000
 ```
 
 > **Note:** Never commit the `.env` file to version control.
@@ -109,7 +115,8 @@ npm test
 | Method | Path | Middleware | Description | Success Code |
 |---|---|---|---|---|
 | **GET** | `/` | None | Basic server heartbeat | `200 OK` |
-| **GET** | `/api/health` | None | Reports API health and MongoDB connection status | `200 OK` |
+| **GET** | `/api/health` | None | Liveness endpoint; reports API and MongoDB status | `200 OK` |
+| **GET** | `/api/ready` | None | Readiness endpoint; indicates whether DB-backed operations can run | `200 OK` or `503` |
 | **POST** | `/api/forms` | `requireDatabase` | Creates a validated dynamic form schema | `201 Created` |
 | **GET** | `/api/forms` | `requireDatabase` | Retrieves list of all saved forms | `200 OK` |
 | **GET** | `/api/forms/:id` | `requireDatabase` | Retrieves a specific form schema by its ID | `200 OK` |
@@ -191,7 +198,8 @@ Uses `multipart/form-data` with the file field named `resume`.
 ---
 
 ## Error Handling & Resilience
-- **Database Independence**: The server connects to MongoDB using `connectDB()`, which catches connection errors without killing the Node process. This ensures `/api/health` stays functional even when MongoDB is offline.
+- **Database Independence**: `app.js` configures the Express application separately from `server.js`, so HTTP routes can be tested without starting a real MongoDB connection. The server catches initial connection failures and retries every `DB_RETRY_INTERVAL_MS` (default 15 seconds) without terminating the API. `/api/health` stays functional while MongoDB is offline.
+- **Liveness vs readiness**: `/api/health` returns HTTP 200 if the API process is responding and includes the database state. `/api/ready` returns HTTP 503 until MongoDB is connected.
 - **Database Guard**: Database-dependent routes use `requireDatabase` middleware to prevent unhandled promise rejections and return an explicit `503 DATABASE_UNAVAILABLE`.
 - **JSON & Body Guard**: Malformed JSON triggers a `400 Bad Request` and payloads exceeding 1MB trigger a `413 Request body is too large`.
 - **404 Handler**: Catches any unmapped API endpoints.
