@@ -1,66 +1,77 @@
 require("dotenv").config();
 
-const express = require("express");
-const cors = require("cors");
 const mongoose = require("mongoose");
+const app = require("./app");
 const connectDB = require("./config/db");
-const routes = require("./routes");
 
-const app = express();
 const PORT = Number(process.env.PORT) || 5000;
-const allowedOrigins = (process.env.FRONTEND_ORIGIN || "http://localhost:5173,http://127.0.0.1:5173")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const DB_RETRY_INTERVAL_MS = Math.max(
+  5000,
+  Number(process.env.DB_RETRY_INTERVAL_MS) || 15000
+);
 
-app.use(cors({ origin: allowedOrigins }));
-app.use(express.json({ limit: "1mb" }));
+let retryTimer;
+let isShuttingDown = false;
+let isConnecting = false;
 
-app.get("/", (_req, res) => {
-  res.json({ success: true, message: "Forma-AI Backend is running" });
-});
-
-app.use("/api", routes);
-
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: `Route not found: ${req.method} ${req.originalUrl}`,
-  });
-});
-
-app.use((error, _req, res, _next) => {
-  if (error.type === "entity.too.large") {
-    return res.status(413).json({ success: false, message: "Request body is too large" });
+async function connectWithRetry() {
+  if (isShuttingDown || isConnecting || mongoose.connection.readyState === 1) {
+    return;
   }
 
-  if (error instanceof SyntaxError && "body" in error) {
-    return res.status(400).json({ success: false, message: "Request body must be valid JSON" });
+  // Missing configuration is a setup issue, not a transient connection failure.
+  if (!process.env.MONGODB_URI?.trim()) {
+    console.error(
+      "MongoDB is not configured. Set MONGODB_URI in backend/.env; API will remain available in degraded mode."
+    );
+    return;
   }
 
-  console.error("Unhandled API error:", error.message);
-  return res.status(500).json({ success: false, message: "Unexpected server error" });
-});
+  isConnecting = true;
+  let connected = false;
+  try {
+    connected = await connectDB();
+  } catch (error) {
+    console.error("Unexpected MongoDB connection error:", error.message);
+  } finally {
+    isConnecting = false;
+  }
+
+  if (!connected && !isShuttingDown) {
+    console.warn(
+      `MongoDB is unavailable. Retrying in ${Math.round(DB_RETRY_INTERVAL_MS / 1000)} seconds.`
+    );
+    retryTimer = setTimeout(() => void connectWithRetry(), DB_RETRY_INTERVAL_MS);
+    retryTimer.unref();
+  }
+}
 
 const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  // Do not terminate the API if Atlas is temporarily unavailable. The health
-  // route reports database readiness and DB-dependent routes return HTTP 503.
-  void connectDB();
+  console.log(`Forma-AI API listening on port ${PORT}`);
+  void connectWithRetry();
+});
+
+server.on("error", (error) => {
+  console.error("HTTP server failed to start:", error.message);
+  process.exitCode = 1;
 });
 
 async function shutdown(signal) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+  clearTimeout(retryTimer);
   console.log(`${signal} received; shutting down Forma-AI backend...`);
+
   server.close(async () => {
     try {
       await mongoose.disconnect();
-    } finally {
-      process.exit(0);
+      process.exitCode = 0;
+    } catch (error) {
+      console.error("Error while closing MongoDB connection:", error.message);
+      process.exitCode = 1;
     }
   });
 }
 
 process.once("SIGINT", () => void shutdown("SIGINT"));
 process.once("SIGTERM", () => void shutdown("SIGTERM"));
-
-module.exports = app;

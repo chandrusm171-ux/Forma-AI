@@ -28,12 +28,19 @@ Forma-AI/
 
 | Member | Role | Responsibilities |
 |---|---|---|
-| **Chandru** | Team Lead | Frontend + Database / Testing |
+| **Chandru** | Team Lead | Frontend, Database / Testing, and AI integration |
 | **Khushi** | Backend Developer | Express APIs & DB Integration |
-| **Akshaya** | AI Developer | LangChain & LLM Extraction |
 | **Vishal** | Frontend & Docs | UI Components, Styling & Documentation |
 
 ---
+
+## Current Stabilization Work
+
+- Split Express app configuration into `backend/app.js` and process startup into `backend/server.js`.
+- Added separate liveness (`GET /api/health`) and readiness (`GET /api/ready`) checks.
+- Added safe initial MongoDB connection retries without disabling TLS verification.
+- Added HTTP smoke tests for health, readiness, invalid JSON, and unknown routes.
+- MongoDB Atlas TLS alert 80 remains an external connection issue to resolve; database-dependent features stay unavailable until a secure connection succeeds.
 
 ## Daily Progress Tracker
 
