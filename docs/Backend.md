@@ -8,6 +8,8 @@
 - **CORS**: Configurable origin allowlist (`FRONTEND_ORIGIN`)
 - **Testing**: Node.js built-in test runner (`node --test`)
 
+Phase 2 currently uses Node.js `fetch()` with an OpenAI-compatible Chat Completions API. It does not yet use LangChain; the provider boundary is isolated in `services/aiExtractionService.js` so it can be replaced or wrapped with LangChain later.
+
 ---
 
 ## Directory & File Structure
@@ -62,6 +64,9 @@ Copy-Item .env.example .env
 | `MONGODB_URI` | MongoDB connection string (Local or Atlas) | `mongodb://127.0.0.1:27017/forma-ai` |
 | `FRONTEND_ORIGIN` | Comma-separated list of allowed frontend origins for CORS | `http://localhost:5173,http://127.0.0.1:5173` |
 | `DB_RETRY_INTERVAL_MS` | Delay between retries after an initial Atlas connection failure (minimum 5000 ms) | `15000` |
+| `OPENAI_API_KEY` | Server-side key for the AI extraction provider | Required for AI extraction |
+| `OPENAI_MODEL` | Model name accepted by the configured provider | `gpt-4o-mini` |
+| `OPENAI_BASE_URL` | Optional OpenAI-compatible Chat Completions endpoint | OpenAI endpoint by default |
 
 ### Sample `.env` Setup:
 
@@ -71,6 +76,10 @@ PORT=5000
 MONGODB_URI=mongodb://127.0.0.1:27017/forma-ai
 FRONTEND_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
 DB_RETRY_INTERVAL_MS=15000
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-4o-mini
+# Optional for OpenAI-compatible providers:
+# OPENAI_BASE_URL=https://api.openai.com/v1/chat/completions
 ```
 
 #### 2. MongoDB Atlas (Cloud):
@@ -123,8 +132,8 @@ npm test
 | **DELETE** | `/api/forms/:id` | `requireDatabase` | Deletes a form schema by its ID | `200 OK` |
 | **POST** | `/api/submissions` | `requireDatabase` | Validates and persists a completed form submission | `201 Created` |
 | **GET** | `/api/submissions/:id` | `requireDatabase` | Retrieves a form submission by its ID | `200 OK` |
-| **POST** | `/api/ai/extract` | None | AI field extraction from natural language (contract placeholder) | `501 Not Implemented` |
-| **POST** | `/api/ai/parse-resume` | None | AI resume parsing endpoint (contract placeholder) | `501 Not Implemented` |
+| **POST** | `/api/ai/extract` | None | AI field extraction from natural language (requires provider key) | `200`, `400`, `429`, `502`, `503`, or `504` |
+| **POST** | `/api/ai/parse-resume` | None | Resume parser placeholder | `501 Not Implemented` |
 
 ---
 
@@ -181,19 +190,21 @@ Returns `status: "ready"` when MongoDB is connected, and `status: "degraded"` wh
 }
 ```
 
-### 3. AI Extraction Handoff (`POST /api/ai/extract`)
+### 3. AI Extraction (`POST /api/ai/extract`)
 The frontend sends:
 ```json
 {
-  "text": "My car was hit from behind on Main Street yesterday.",
+  "text": "My Honda City hit a deer and the front bumper was damaged.",
   "schemaId": "insurance-claim"
 }
 ```
-*Current Behavior*: Returns HTTP `501` with code `AI_SERVICE_NOT_CONFIGURED` until the LangChain / LLM provider integration is wired up.
 
-### 4. AI Resume Parser Handoff (`POST /api/ai/parse-resume`)
-Uses `multipart/form-data` with the file field named `resume`.
-*Current Behavior*: Returns HTTP `501` with code `AI_SERVICE_NOT_CONFIGURED` until parsing logic is implemented.
+When `OPENAI_API_KEY` is configured, the backend sends a structured extraction prompt to the configured OpenAI-compatible Chat Completions endpoint. The response is parsed and normalized against the allowlisted insurance-claim fields. Unknown fields and unsupported incident types are discarded. Unknown values are omitted instead of fabricated. The UI must let the user review and correct extracted values before submission.
+
+If no provider key is configured, the endpoint returns HTTP `503` with `AI_SERVICE_NOT_CONFIGURED`. Provider failures return safe errors without forwarding the provider's raw response body. Request text is limited to 10,000 characters.
+
+### 4. AI Resume Parser (`POST /api/ai/parse-resume`)
+Resume parsing remains a separate follow-up feature. It returns HTTP `501` with `RESUME_PARSER_NOT_CONFIGURED` until file type validation, document text extraction, and structured resume parsing are implemented.
 
 ---
 
@@ -210,4 +221,6 @@ Uses `multipart/form-data` with the file field named `resume`.
 This project is currently in the development MVP phase:
 - Add JWT or session-based authentication before deploying to production.
 - Add rate limiting (e.g. `express-rate-limit`) on sensitive submission and AI endpoints.
+- Add authentication/authorization before exposing saved submissions or forms in production.
+- Consider a provider-specific LangChain adapter if the team needs model switching or more advanced output parsing.
 - Configure proper TLS verification and keep connection credentials in environment variables only.

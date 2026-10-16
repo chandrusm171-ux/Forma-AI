@@ -19,7 +19,7 @@ Forma-AI/
 ## Directory Roles
 
 - **`frontend/`**: Dynamic form rendering using `react-hook-form`, UI components, and state management.
-- **`backend/`**: Express API, MongoDB database connection, and LangChain LLM integration.
+- **`backend/`**: Express API, MongoDB persistence, and AI extraction provider integration.
 - **`docs/`**: Documentation and architecture notes.
 
 ---
@@ -41,6 +41,13 @@ Forma-AI/
 - Added safe initial MongoDB connection retries without disabling TLS verification.
 - Added HTTP smoke tests for health, readiness, invalid JSON, and unknown routes.
 - MongoDB Atlas TLS alert 80 remains an external connection issue to resolve; database-dependent features stay unavailable until a secure connection succeeds.
+
+## Phase 2 — AI Incident Extraction
+
+- Replaced the `/api/ai/extract` placeholder with an OpenAI-compatible Chat Completions integration using server-side environment configuration.
+- Added request limits, supported-schema allowlisting, structured JSON parsing, field/type allowlisting, safe provider errors, and timeout handling.
+- The frontend already calls `/api/ai/extract`; extracted values can prefill the insurance claim form after the provider key is configured.
+- Resume parsing remains a separate follow-up feature and is explicitly marked as not implemented.
 
 ## Daily Progress Tracker
 

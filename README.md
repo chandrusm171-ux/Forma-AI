@@ -76,5 +76,18 @@ The frontend uses `http://localhost:5000/api` by default. To override it, copy `
 
 - The backend process does not crash when Atlas is unavailable.
 - Database-backed routes return `503 DATABASE_UNAVAILABLE` until the database connects.
-- AI endpoints intentionally return `501 AI_SERVICE_NOT_CONFIGURED` until the real provider integration is implemented.
+- Keep TLS certificate verification enabled for MongoDB Atlas.
 - Do not commit `.env` or `.env.local` files, credentials, or `node_modules`.
+
+### Phase 2 — AI incident extraction
+
+The backend now supports real incident-description extraction through an OpenAI-compatible Chat Completions API.
+
+1. Set `OPENAI_API_KEY` in `backend/.env`.
+2. Optionally set `OPENAI_MODEL` (default: `gpt-4o-mini`) and `OPENAI_BASE_URL` if using a compatible endpoint.
+3. Start the backend and submit a natural-language incident description from the Form page.
+4. Review all extracted values before submitting the form. The AI must not be treated as the source of truth.
+
+`POST /api/ai/extract` returns only supported fields for the `insurance-claim` schema. It returns `503 AI_SERVICE_NOT_CONFIGURED` if no key is configured and safe error responses for provider failures. The key remains server-side and must never be added to a `VITE_*` variable. This first provider integration uses Node.js `fetch()` directly; LangChain is not yet part of the runtime path.
+
+Resume parsing remains a separate, not-yet-implemented feature and returns `501 RESUME_PARSER_NOT_CONFIGURED`.
