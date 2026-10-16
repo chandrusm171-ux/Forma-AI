@@ -31,17 +31,13 @@ function FormPage() {
   };
 
   const handleAnalyze = async (story) => {
-    console.log("AI input:", story);
-
     setIsExtracting(true);
 
     try {
       const extractedData = await extractFormData(story);
-      console.log("Extracted data:", extractedData);
       setPrefillData(extractedData);
       showToast("success", "Form fields have been populated with extracted data.");
     } catch (error) {
-      console.error("Extraction failed:", error);
       showToast("error", error?.message || "Failed to extract data. Please try again.");
       throw error; // re-throw so MagicInput can also show its own status
     } finally {

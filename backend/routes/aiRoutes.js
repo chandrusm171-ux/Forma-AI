@@ -1,18 +1,47 @@
 const express = require("express");
+const {
+  AIServiceError,
+  extractFormData,
+} = require("../services/aiExtractionService");
 
 const router = express.Router();
 
-function aiNotConfigured(_req, res) {
+router.post("/extract", async (req, res) => {
+  try {
+    const { text, schemaId = "insurance-claim" } = req.body || {};
+    const data = await extractFormData({ text, schemaId });
+
+    return res.status(200).json({
+      success: true,
+      message: "Incident details extracted. Review the values before submitting the form.",
+      data,
+    });
+  } catch (error) {
+    if (error instanceof AIServiceError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        code: error.code,
+        message: error.message,
+      });
+    }
+
+    console.error("Unexpected AI extraction error:", error.message);
+    return res.status(500).json({
+      success: false,
+      code: "AI_EXTRACTION_FAILED",
+      message: "AI extraction failed unexpectedly. Please try again.",
+    });
+  }
+});
+
+// Resume parsing is a separate feature and remains explicitly unavailable until
+// file extraction, file validation, and document parsing are implemented.
+router.post("/parse-resume", (_req, res) => {
   return res.status(501).json({
     success: false,
-    code: "AI_SERVICE_NOT_CONFIGURED",
-    message: "The AI service is not connected yet. The AI integration owner must configure the extraction provider before this endpoint can be used.",
+    code: "RESUME_PARSER_NOT_CONFIGURED",
+    message: "Resume parsing is not implemented yet. Incident description extraction is available when an AI provider is configured.",
   });
-}
-
-// API contract for the AI integration owner. Replace these handlers when the
-// LangChain/LLM service is ready; never return fabricated extraction results.
-router.post("/extract", aiNotConfigured);
-router.post("/parse-resume", aiNotConfigured);
+});
 
 module.exports = router;
