@@ -396,10 +396,11 @@ Day 11 Update: Improved consistency across pages, components, buttons, forms and
 
 2. **Form Components & Field Standardization**:
    - **Unified Wrapper & Label Architecture**: Aligned `SelectField.jsx` and `TextareaField.jsx` with `Input.jsx` by adopting `.ui-input-wrapper`, `.ui-input-label`, and `.ui-input-container` wrapper structures.
+   - **Full Prop Parity in TextField**: Forwarded `disabled={field.disabled}` and `helperText={field.helperText || field.description}` from `TextField.jsx` to the underlying `Input.jsx` component, achieving full prop consistency across all form controls.
    - **Standardized Required Indicators**: Replaced ad-hoc inline styles with the design-token-backed `.ui-required-mark` CSS class across all text, select, textarea, and checkbox fields.
-   - **Comprehensive Helper Text Support**: Extended `field.helperText` and `field.description` support across `SelectField`, `TextareaField`, and `CheckboxField`, rendering `<p className="ui-input-helper">` dynamically.
+   - **Comprehensive Helper Text Support**: Extended `field.helperText` and `field.description` support across `TextField`, `SelectField`, `TextareaField`, and `CheckboxField`, rendering `<p className="ui-input-helper">` dynamically.
    - **Accessible Error Describers**: Synchronized `aria-invalid` and `aria-describedby` across all field components, pointing cleanly to either `${field.name}-error` when invalid or `${field.name}-helper` when valid.
-   - **Consistent Disabled Handling**: Passed `disabled={field.disabled}` to select, textarea, and checkbox controls to match text inputs.
+   - **Consistent Disabled Handling**: Passed `disabled={field.disabled}` across all field controls (text, select, textarea, checkbox).
 
 3. **Complete Form Field Error Styling (`index.css`)**:
    - Extended `.has-error` state styling in `index.css` beyond text inputs to include `select`, `textarea`, `.ui-select-field`, `.ui-textarea-field`, and `.checkbox-field label`.
@@ -409,10 +410,10 @@ Day 11 Update: Improved consistency across pages, components, buttons, forms and
 4. **Button & Interaction Polish**:
    - **Unified Interactive Feedback**: Added smooth hover elevations (`transform: translateY(-1px)`), contextual box-shadows, and active-state resets (`transform: translateY(0)`) across all button variants (`secondary`, `outline`, `ghost`, `danger`) to match `primary`.
    - **Standardized Button Actions on ResumePage**: Upgraded the "Open Dynamic Form" navigation link in `ResumePage.jsx` to use the reusable `Button` primitive (`variant="outline"`), matching the button ergonomics of `Home.jsx`.
-   - **Mobile Action Stacking**: Ensured button action containers stretch and stack consistently on mobile viewports without overflowing.
+   - **Mobile Action Stacking**: Ensured all button action containers (`.home-actions`, `.resume-actions`, `.form-submit-actions`) stretch and stack vertically (`flex-direction: column; align-items: stretch; width: 100%`) on mobile viewports (≤ 768px) without overflowing.
 
 5. **User Feedback & Dismiss Controls**:
-   - **Interactive Dismiss Buttons**: Polished `.form-submit-status-dismiss`, `.magic-status-dismiss`, and `.ui-toast-close` with subtle hover scaling (`scale(1.1)`), rounded corners, `:focus-visible` accessibility rings, and explicit `type="button"` attributes.
-   - **Form Submission Actions**: Replaced inline margins in `DynamicForm.jsx` with a dedicated `.form-submit-actions` class.
+   - **Interactive Dismiss Buttons**: Polished `.form-submit-status-dismiss`, `.magic-status-dismiss`, and `.ui-toast-close` with subtle hover scaling (`scale(1.1)`), rounded corners, `:focus-visible` accessibility rings, and explicit `type="button"` attributes (including `Toast.jsx` close button to avoid accidental form submissions).
+   - **Form Submission Actions**: Replaced inline margins in `DynamicForm.jsx` with a dedicated `.form-submit-actions` class with responsive support.
 
 

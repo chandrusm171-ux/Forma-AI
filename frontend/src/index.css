@@ -93,7 +93,12 @@ html::-webkit-scrollbar {
 body {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
-  background: var(--color-background);
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.07) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.05) 0px, transparent 50%);
+  background-attachment: fixed;
   color: var(--color-text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -134,14 +139,16 @@ code {
    Navbar / Site Header
    ========================================================================== */
 .site-header {
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 40;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
 }
 
 .navbar-container {
@@ -172,13 +179,14 @@ code {
 }
 
 .brand-badge {
-  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
   color: white;
   font-size: var(--font-size-xs);
   font-weight: 800;
-  padding: 3px 7px;
+  padding: 3px 8px;
   border-radius: var(--radius-sm);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.35);
 }
 
 .brand-name {
@@ -291,10 +299,15 @@ code {
 }
 
 .form-page-header h1 {
-  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-size: clamp(1.75rem, 4vw, 3rem);
   font-weight: 800;
   line-height: 1.1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
+  color: #0f172a;
+  background: linear-gradient(135deg, #0f172a 25%, #334155 70%, #2563eb 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .form-page-header p {
@@ -316,11 +329,13 @@ code {
    MagicInput Section
    ========================================================================== */
 .magic-input {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  box-shadow: var(--shadow-sm);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -382,11 +397,13 @@ code {
    Dynamic Form Card
    ========================================================================== */
 form {
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding: var(--space-8);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .form-header {
@@ -923,13 +940,22 @@ button {
   padding: 4px;
   cursor: pointer;
   opacity: 0.6;
-  transition: opacity var(--transition-fast);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
   display: flex;
   align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .ui-toast-close:hover {
   opacity: 1;
+  transform: scale(1.1);
+}
+
+.ui-toast-close:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
 }
 
 .ui-toast-close svg {
@@ -1488,18 +1514,32 @@ button {
 }
 
 .home-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px 12px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(99, 102, 241, 0.12) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.22);
+  border-radius: var(--radius-pill);
   color: var(--color-primary);
   font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.08);
 }
 
 .home-hero-copy h1 {
   max-width: 720px;
-  font-size: clamp(1.75rem, 5vw, 4rem);
+  font-size: clamp(2rem, 5vw, 3.8rem);
   font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.045em;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  color: #0f172a;
+  background: linear-gradient(135deg, #0f172a 25%, #334155 70%, #2563eb 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .home-hero-copy p {
@@ -1519,11 +1559,13 @@ button {
 }
 
 .home-hero-card {
-  padding: var(--space-6);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  padding: var(--space-8);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
 }
 
 .workflow-step {
@@ -1540,10 +1582,12 @@ button {
   width: 42px;
   height: 42px;
   border-radius: var(--radius-md);
-  background: var(--color-primary-light);
-  color: var(--color-primary-dark);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.14) 100%);
+  color: var(--color-primary);
   font-size: var(--font-size-xs);
   font-weight: 800;
+  border: 1px solid rgba(59, 130, 246, 0.22);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12);
 }
 
 .workflow-step div {
@@ -1562,10 +1606,11 @@ button {
 }
 
 .workflow-line {
-  width: 1px;
+  width: 2px;
   height: 28px;
-  margin: 6px 0 6px 21px;
-  background: var(--color-border);
+  margin: 6px 0 6px 20px;
+  background: linear-gradient(to bottom, var(--color-primary), rgba(203, 213, 225, 0.5));
+  border-radius: 1px;
 }
 
 .home-section-heading {
@@ -1586,17 +1631,43 @@ button {
 
 .feature-card {
   padding: var(--space-6);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
 }
 
 .feature-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-border-hover);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow: 0 16px 32px -4px rgba(59, 130, 246, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+}
+
+.feature-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.14) 100%);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+  border: 1px solid rgba(59, 130, 246, 0.18);
+  transition: all 0.25s ease;
+}
+
+.feature-card:hover .feature-icon {
+  background: linear-gradient(135deg, var(--color-primary), #6366f1);
+  color: #ffffff;
+  border-color: transparent;
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
 }
 
 .feature-card h3 {
@@ -1626,8 +1697,15 @@ button {
 }
 
 .resume-header h1 {
-  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-size: clamp(1.75rem, 4vw, 3rem);
   font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  color: #0f172a;
+  background: linear-gradient(135deg, #0f172a 25%, #334155 70%, #2563eb 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .resume-header p {
@@ -1637,10 +1715,12 @@ button {
 
 .resume-upload-card {
   padding: var(--space-8);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
 }
 
 .resume-upload-area {
@@ -1650,32 +1730,41 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   text-align: center;
-  border: 1px dashed var(--color-border-hover);
+  border: 2px dashed rgba(203, 213, 225, 0.9);
   border-radius: var(--radius-lg);
-  background: var(--color-surface-raised);
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
   cursor: pointer;
-  transition: border-color var(--transition-fast), background var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .resume-upload-area:hover {
   border-color: var(--color-primary);
-  background: var(--color-primary-light);
+  background: linear-gradient(180deg, #f0f7ff 0%, #e6f0fd 100%);
+  transform: scale(1.004);
 }
 
 .resume-upload-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   margin-bottom: var(--space-2);
   border-radius: 50%;
   background: var(--color-primary-light);
   color: var(--color-primary);
-  font-size: 1.5rem;
-  font-weight: 700;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+  transition: all var(--transition-fast);
+}
+
+.resume-upload-area:hover .resume-upload-icon {
+  background: var(--color-primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.28);
 }
 
 .resume-upload-area span:not(.resume-upload-icon) {
@@ -1959,6 +2048,16 @@ button {
 
   .form-field {
     margin-bottom: var(--space-4);
+  }
+
+  .form-submit-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-submit-actions .ui-btn {
+    width: 100%;
   }
 
   .magic-input {

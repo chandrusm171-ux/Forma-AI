@@ -82,6 +82,7 @@ function Toast({
       </span>
       <p className="ui-toast-message">{message}</p>
       <button
+        type="button"
         className="ui-toast-close"
         onClick={dismiss}
         aria-label="Dismiss notification"

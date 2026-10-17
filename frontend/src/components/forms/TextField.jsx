@@ -11,6 +11,8 @@ function TextField({ field, register, error }) {
       type={field.type === "email" ? "email" : "text"}
       placeholder={field.placeholder || ""}
       required={field.required}
+      disabled={field.disabled}
+      helperText={field.helperText || field.description}
       error={error}
       {...register(field.name, rules)}
     />

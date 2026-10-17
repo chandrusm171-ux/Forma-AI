@@ -84,7 +84,11 @@ function ResumePage() {
 
           <label className="resume-upload-area" htmlFor="resume-file">
             <span className="resume-upload-icon" aria-hidden="true">
-              ↑
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="28" height="28">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
             </span>
             <strong>{fileName || "Choose a resume file"}</strong>
             <span>
@@ -118,11 +122,27 @@ function ResumePage() {
               disabled={!fileName}
               isLoading={isParsing}
               onClick={handleParse}
+              leftIcon={
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              }
             >
               {isParsing ? "Parsing…" : "Parse Resume"}
             </Button>
             <Link to="/form" className="resume-back-link">
-              <Button type="button" variant="outline" size="md">
+              <Button
+                type="button"
+                variant="outline"
+                size="md"
+                rightIcon={
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                    <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
+                  </svg>
+                }
+              >
                 Open Dynamic Form
               </Button>
             </Link>
@@ -135,7 +155,10 @@ function ResumePage() {
             <div className="resume-results-header">
               <h2>Parsed Results</h2>
               <span className="resume-results-badge">
-                ✓ Extracted
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="14" height="14" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Extracted
               </span>
             </div>
             <div className="resume-results-grid">

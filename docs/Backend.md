@@ -33,6 +33,8 @@ backend/
 │   ├── formRoutes.js                # /api/forms CRUD routes (protected by requireDatabase)
 │   ├── submissionRoutes.js          # /api/submissions routes (protected by requireDatabase)
 │   └── aiRoutes.js                  # /api/ai contract endpoints (extract, parse-resume)
+├── services/
+│   └── aiExtractionService.js       # AI Chat Completions extraction provider & data normalizer
 ├── utils/
 │   ├── validateFormSchema.js        # Validates form schema structure, field types, and conditions
 │   └── validateSubmissionPayload.js # Validates submission payload (formId, formTitle, data)
@@ -44,6 +46,19 @@ backend/
 ├── .env.example                     # Environment template
 └── .env                             # Local environment variables (do not commit)
 ```
+
+---
+
+## Daily Progress Log (Backend)
+
+| Day | Milestone | Summary |
+|---|---|---|
+| **Days 1–4** | Architecture & Setup | Defined backend architecture, Express 5 server skeleton, route blueprints, and environment configurations. |
+| **Day 5** | CORS & Health Endpoint | Configured configurable `FRONTEND_ORIGIN` allowlist for Vite dev server and established initial `/api/health` connectivity check. |
+| **Days 6–7** | Readiness & DB Guard | Separated process liveness (`/api/health`) from operational readiness (`/api/ready`). Designed `requireDatabase` middleware returning 503 when DB is offline. |
+| **Days 8–9** | Connection Resilience & Isolation | Split Express app (`app.js`) from HTTP listener (`server.js`) for testability. Implemented non-blocking MongoDB connection retries (`DB_RETRY_INTERVAL_MS`) maintaining strict TLS certificate verification. |
+| **Day 10** | Schema & Submission Persistence | Implemented Mongoose models (`Form`, `Submission`), payload validation utilities (`validateFormSchema`, `validateSubmissionPayload`), and built unit/smoke test suites (`api.test.js`, `validation.test.js`). |
+| **Day 11** | Phase 2 AI Integration & UI Alignment | Integrated OpenAI-compatible Chat Completions via `aiExtractionService.js` for natural language incident extraction (`/api/ai/extract`), supported field allowlisting, safe error boundaries, and aligned payload contracts with frontend form submission. |
 
 ---
 

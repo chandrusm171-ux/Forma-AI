@@ -99,7 +99,10 @@ function DynamicForm({ schema, initialValues = {} }) {
             onClick={dismissStatus}
             aria-label="Dismiss message"
           >
-            ✕
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" width="14" height="14" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
       )}
@@ -124,6 +127,11 @@ function DynamicForm({ schema, initialValues = {} }) {
           variant="primary"
           size="md"
           isLoading={isSubmitting}
+          rightIcon={
+            <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18" aria-hidden="true">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          }
         >
           {isSubmitting ? "Saving…" : "Submit Form"}
         </Button>
