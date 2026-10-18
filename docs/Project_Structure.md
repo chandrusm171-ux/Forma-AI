@@ -10,7 +10,8 @@ Forma-AI/
 ├── docs/                     # Project documentation
 │   ├── Project_Structure.md  # Folder structure & team roles
 │   ├── Frontend.md           # React components & UI guide
-│   └── Backend.md            # Backend setup & API documentation
+│   ├── Backend.md            # Backend setup & API documentation
+│   └── Next_Steps.md         # Phase 3 checklist and follow-up roadmap
 └── README.md
 ```
 
@@ -64,3 +65,11 @@ Forma-AI/
 - **Day 10**: UI Refactoring — Refactored frontend components and improved code organization, readability, and maintainability. Created root barrel exports (`components/index.js`, `pages/index.js`), standardized clean component imports across all pages (`Home`, `FormPage`, `ResumePage`, `App`), unified form field validation in `CheckboxField`, and documented component architecture.
 - **Day 10 (Backend & API)**: Aligned the frontend form service with backend routes, added persisted form submissions and API/database-aware health reporting, established explicit AI endpoint contracts, and added backend validation tests.
 - **Day 11**: UI Consistency & Documentation — Improved consistency across pages, components, buttons, forms, and user interactions. Standardized page headers and semantic landmarks across `Home`, `FormPage`, and `ResumePage`. Unified button hover, elevation, and active states across all variants (`primary`, `secondary`, `outline`, `ghost`, `danger`). Achieved full prop parity (`disabled`, `helperText`, `required`) across all form components (`TextField`, `SelectField`, `TextareaField`, `CheckboxField`) matching the `Input` UI primitive. Polished dismiss controls (`type="button"`, hover scaling, focus rings) on Toast and status banners, added responsive mobile action stacking for `.form-submit-actions`, and updated comprehensive frontend/backend documentation.
+
+
+## Phase 3 — Local Ollama Integration
+
+- Added Chat Completions URL normalization so a base URL ending in `/v1` is correctly resolved to `/v1/chat/completions`.
+- Documented local Ollama settings so development does not require paid OpenAI API credits.
+- Added automated tests for Ollama endpoint URL resolution and request routing.
+- Next: verify AI extraction end-to-end in the React form, verify MongoDB submission persistence, run frontend lint/build, then commit and open a pull request into `develop`.
