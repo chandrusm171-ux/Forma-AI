@@ -10,8 +10,8 @@ function getApiErrorMessage(error, fallback) {
 
 /**
  * Ask the backend AI integration to extract values for the selected schema.
- * The backend currently returns AI_SERVICE_NOT_CONFIGURED until the LangChain
- * provider is implemented. This service intentionally does not fabricate data.
+ * The backend calls a server-configured OpenAI-compatible Chat Completions API
+ * (including local Ollama). This service intentionally does not fabricate data.
  */
 export async function extractFormData(story, schemaId = "insurance-claim") {
   if (typeof story !== "string" || !story.trim()) {

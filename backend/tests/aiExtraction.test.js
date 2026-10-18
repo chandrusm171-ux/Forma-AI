@@ -4,6 +4,7 @@ const {
   AIServiceError,
   extractFormData,
   normalizeExtractedData,
+  resolveChatCompletionsUrl,
 } = require("../services/aiExtractionService");
 
 function fakeFetch(payload, status = 200) {
@@ -107,4 +108,51 @@ test("AI provider failures are returned as safe errors", async () => {
       error.statusCode === 502 &&
       !error.message.includes("private")
   );
+});
+
+
+test("Ollama base URL is normalized to the Chat Completions endpoint", () => {
+  assert.equal(
+    resolveChatCompletionsUrl("http://localhost:11434/v1"),
+    "http://localhost:11434/v1/chat/completions"
+  );
+});
+
+test("Chat Completions URL is not appended twice", () => {
+  assert.equal(
+    resolveChatCompletionsUrl("http://localhost:11434/v1/chat/completions/"),
+    "http://localhost:11434/v1/chat/completions"
+  );
+});
+
+test("host-only compatible provider URLs receive the standard v1 endpoint", () => {
+  assert.equal(
+    resolveChatCompletionsUrl("https://api.example.test"),
+    "https://api.example.test/v1/chat/completions"
+  );
+});
+
+test("AI extraction posts to the resolved Chat Completions URL", async () => {
+  let requestedUrl;
+  const fetchImpl = async (url, options) => {
+    requestedUrl = url;
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({
+        choices: [{ message: { content: JSON.stringify({ vehicle: "Honda City" }) } }],
+      }),
+    };
+  };
+
+  await extractFormData(
+    { text: "My Honda City was damaged." },
+    {
+      apiKey: "ollama-local",
+      baseUrl: "http://localhost:11434/v1",
+      fetchImpl,
+    }
+  );
+
+  assert.equal(requestedUrl, "http://localhost:11434/v1/chat/completions");
 });

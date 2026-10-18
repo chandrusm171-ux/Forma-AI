@@ -8,7 +8,7 @@
 - **CORS**: Configurable origin allowlist (`FRONTEND_ORIGIN`)
 - **Testing**: Node.js built-in test runner (`node --test`)
 
-Phase 2 currently uses Node.js `fetch()` with an OpenAI-compatible Chat Completions API. It does not yet use LangChain; the provider boundary is isolated in `services/aiExtractionService.js` so it can be replaced or wrapped with LangChain later.
+The AI extraction service uses Node.js `fetch()` with an OpenAI-compatible Chat Completions API. It does not yet use LangChain; the provider boundary is isolated in `services/aiExtractionService.js` so it can be replaced or wrapped with LangChain later. `OPENAI_BASE_URL` may be a base URL such as `http://localhost:11434/v1`; the service normalizes it to `/chat/completions`.
 
 ---
 
@@ -81,7 +81,7 @@ Copy-Item .env.example .env
 | `DB_RETRY_INTERVAL_MS` | Delay between retries after an initial Atlas connection failure (minimum 5000 ms) | `15000` |
 | `OPENAI_API_KEY` | Server-side key for the AI extraction provider | Required for AI extraction |
 | `OPENAI_MODEL` | Model name accepted by the configured provider | `gpt-4o-mini` |
-| `OPENAI_BASE_URL` | Optional OpenAI-compatible Chat Completions endpoint | OpenAI endpoint by default |
+| `OPENAI_BASE_URL` | Optional OpenAI-compatible API base URL or full Chat Completions URL | `https://api.openai.com/v1` by default |
 
 ### Sample `.env` Setup:
 
@@ -93,8 +93,13 @@ FRONTEND_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
 DB_RETRY_INTERVAL_MS=15000
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-4o-mini
-# Optional for OpenAI-compatible providers:
-# OPENAI_BASE_URL=https://api.openai.com/v1/chat/completions
+# Optional OpenAI-compatible API base URL:
+# OPENAI_BASE_URL=https://api.openai.com/v1
+
+# Local Ollama (free local inference; Ollama must be running):
+# OPENAI_API_KEY=ollama-local
+# OPENAI_MODEL=llama3.2
+# OPENAI_BASE_URL=http://localhost:11434/v1
 ```
 
 #### 2. MongoDB Atlas (Cloud):
@@ -214,7 +219,7 @@ The frontend sends:
 }
 ```
 
-When `OPENAI_API_KEY` is configured, the backend sends a structured extraction prompt to the configured OpenAI-compatible Chat Completions endpoint. The response is parsed and normalized against the allowlisted insurance-claim fields. Unknown fields and unsupported incident types are discarded. Unknown values are omitted instead of fabricated. The UI must let the user review and correct extracted values before submission.
+When `OPENAI_API_KEY` is configured, the backend sends a structured extraction prompt to the configured OpenAI-compatible Chat Completions endpoint. For Ollama, a placeholder key such as `ollama-local` is accepted by the local OpenAI-compatible endpoint; no OpenAI credits are needed. The response is parsed and normalized against the allowlisted insurance-claim fields. Unknown fields and unsupported incident types are discarded. Unknown values are omitted instead of fabricated. The UI must let the user review and correct extracted values before submission.
 
 If no provider key is configured, the endpoint returns HTTP `503` with `AI_SERVICE_NOT_CONFIGURED`. Provider failures return safe errors without forwarding the provider's raw response body. Request text is limited to 10,000 characters.
 
@@ -239,3 +244,15 @@ This project is currently in the development MVP phase:
 - Add authentication/authorization before exposing saved submissions or forms in production.
 - Consider a provider-specific LangChain adapter if the team needs model switching or more advanced output parsing.
 - Configure proper TLS verification and keep connection credentials in environment variables only.
+
+
+## Phase 3 — Ollama local AI verification
+
+1. Verify Ollama's model is installed with `ollama list`.
+2. Confirm `OPENAI_BASE_URL=http://localhost:11434/v1`, `OPENAI_API_KEY=ollama-local`, and `OPENAI_MODEL=llama3.2` in the private `backend/.env`.
+3. Run `npm test`, then `npm run dev`.
+4. Send a test request to `POST /api/ai/extract` with `text` and `schemaId: "insurance-claim"`.
+5. Verify the frontend's Analyze with AI flow, form prefill, conditional fields, and persisted submission.
+6. Run frontend lint/build and review the pull request.
+
+Troubleshooting: `AI_PROVIDER_REJECTED` is a generic provider response error. Check that Ollama is running and that the backend is calling `http://localhost:11434/v1/chat/completions`. Do not put provider credentials in frontend environment variables or commit `.env`.

@@ -79,12 +79,32 @@ function buildMessages(text) {
   ];
 }
 
+function resolveChatCompletionsUrl(baseUrl) {
+  if (typeof baseUrl !== "string" || !baseUrl.trim()) {
+    throw new AIServiceError("Set OPENAI_BASE_URL to a valid OpenAI-compatible API base URL.", {
+      statusCode: 503,
+      code: "AI_SERVICE_NOT_CONFIGURED",
+    });
+  }
+
+  const normalized = baseUrl.trim().replace(/\/+$/, "");
+  if (/\/chat\/completions$/i.test(normalized)) {
+    return normalized;
+  }
+  if (/\/v1$/i.test(normalized)) {
+    return `${normalized}/chat/completions`;
+  }
+
+  // A host-only URL is treated as the standard OpenAI-compatible API root.
+  return `${normalized}/v1/chat/completions`;
+}
+
 async function extractFormData(
   { text, schemaId = ALLOWED_SCHEMA_ID },
   {
     apiKey = process.env.OPENAI_API_KEY,
     model = process.env.OPENAI_MODEL || "gpt-4o-mini",
-    baseUrl = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1/chat/completions",
+    baseUrl = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1",
     fetchImpl = globalThis.fetch,
     timeoutMs = 30000,
   } = {}
@@ -130,7 +150,7 @@ async function extractFormData(
 
   let response;
   try {
-    response = await fetchImpl(baseUrl, {
+    response = await fetchImpl(resolveChatCompletionsUrl(baseUrl), {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -199,4 +219,5 @@ module.exports = {
   AIServiceError,
   extractFormData,
   normalizeExtractedData,
+  resolveChatCompletionsUrl,
 };
