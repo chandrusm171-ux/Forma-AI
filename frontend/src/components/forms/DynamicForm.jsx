@@ -13,7 +13,7 @@ import { formService } from "../../services";
  * - A success banner appears after submission for user feedback.
  * - All fields are disabled during submission to prevent double-submit.
  */
-function DynamicForm({ schema, initialValues = {} }) {
+function DynamicForm({ schema, initialValues = {}, onReset }) {
   const {
     register,
     handleSubmit,
@@ -58,6 +58,13 @@ function DynamicForm({ schema, initialValues = {} }) {
         "Submission failed. Please try again."
       );
     }
+  };
+
+  const handleReset = () => {
+    reset({});
+    setSubmitStatus(null);
+    setSubmitMessage("");
+    onReset?.();
   };
 
   const dismissStatus = () => {
@@ -134,6 +141,16 @@ function DynamicForm({ schema, initialValues = {} }) {
           }
         >
           {isSubmitting ? "Saving…" : "Submit Form"}
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="md"
+          disabled={isSubmitting}
+          onClick={handleReset}
+        >
+          Reset Form
         </Button>
       </div>
     </form>

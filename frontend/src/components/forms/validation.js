@@ -36,6 +36,11 @@ export function buildValidationRules(field) {
         validation.patternMessage ||
         `${field.label || field.name} has an invalid format`,
     };
+  } else if (field.type === "email") {
+    rules.pattern = {
+      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      message: "Please enter a valid email address",
+    };
   }
 
   return rules;

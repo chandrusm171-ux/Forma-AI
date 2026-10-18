@@ -26,6 +26,28 @@ function Navbar({ brandName = "Forma AI" }) {
     };
   }, [mobileOpen]);
 
+  /* Close mobile menu on Escape key */
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape" && mobileOpen) {
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileOpen]);
+
+  /* Auto-close mobile drawer when viewport is resized to desktop */
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768 && mobileOpen) {
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [mobileOpen]);
+
   /* Check backend health when the application loads */
   useEffect(() => {
     let isMounted = true;

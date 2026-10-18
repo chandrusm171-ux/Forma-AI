@@ -6,24 +6,24 @@ import {
   Toast,
   ProgressBar,
   PageLayout,
+  ErrorState,
 } from "../components";
 import { parseResume } from "../services/aiService";
 
 /**
  * ResumePage – Resume parsing interface with loading states.
  *
- * Day 6 enhancements:
- * - Parsing button shows a spinner via isLoading while the resume is being processed.
- * - An indeterminate progress bar appears during parsing for visual feedback.
- * - A Loading overlay covers the upload card while processing.
- * - Parsed results are displayed in a structured card.
- * - Toast notifications provide success/error feedback.
+ * Day 12 enhancements:
+ * - Added inline ErrorState with retry functionality when backend parsing endpoint is unavailable or fails.
+ * - Added Clear File action for resetting selection.
+ * - Improved responsive interaction and error persistence.
  */
 function ResumePage() {
   const [fileName, setFileName] = useState("");
   const [file, setFile] = useState(null);
   const [isParsing, setIsParsing] = useState(false);
   const [parsedData, setParsedData] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
   const [toast, setToast] = useState({ visible: false, type: "info", message: "" });
 
   const showToast = (type, message) => {
@@ -39,6 +39,16 @@ function ResumePage() {
     setFileName(selectedFile ? selectedFile.name : "");
     setFile(selectedFile || null);
     setParsedData(null); // clear previous results
+    setErrorMessage("");
+  };
+
+  const handleClearFile = () => {
+    setFileName("");
+    setFile(null);
+    setParsedData(null);
+    setErrorMessage("");
+    const fileInput = document.getElementById("resume-file");
+    if (fileInput) fileInput.value = "";
   };
 
   const handleParse = async () => {
@@ -46,6 +56,7 @@ function ResumePage() {
 
     setIsParsing(true);
     setParsedData(null);
+    setErrorMessage("");
 
     try {
       const result = await parseResume(file);
@@ -53,7 +64,9 @@ function ResumePage() {
       showToast("success", `Resume "${file.name}" parsed successfully.`);
     } catch (error) {
       console.error("Resume parsing failed:", error);
-      showToast("error", error?.message || "Failed to parse resume. Please try again.");
+      const msg = error?.message || "Failed to parse resume. Please try again.";
+      setErrorMessage(msg);
+      showToast("error", msg);
     } finally {
       setIsParsing(false);
     }
@@ -132,6 +145,17 @@ function ResumePage() {
             >
               {isParsing ? "Parsing…" : "Parse Resume"}
             </Button>
+            {Boolean(fileName) && !isParsing && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="md"
+                onClick={handleClearFile}
+              >
+                Clear File
+              </Button>
+            )}
+
             <Link to="/form" className="resume-back-link">
               <Button
                 type="button"
@@ -148,6 +172,16 @@ function ResumePage() {
             </Link>
           </div>
         </div>
+
+        {/* ── Error state when parsing fails ── */}
+        {Boolean(errorMessage) && !isParsing && (
+          <ErrorState
+            title="Resume Parsing Unavailable"
+            description={errorMessage}
+            retryLabel="Retry Parsing"
+            onRetry={handleParse}
+          />
+        )}
 
         {/* ── Parsed results card ── */}
         {parsedData && (

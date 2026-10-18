@@ -73,6 +73,7 @@ function FormPage() {
             <DynamicForm
               schema={insuranceClaimSchema}
               initialValues={prefillData}
+              onReset={() => setPrefillData({})}
             />
           </div>
         </div>

@@ -43,6 +43,11 @@ function MagicInput({ onAnalyze }) {
     }
   };
 
+  const handleClear = () => {
+    setStory("");
+    setStatus(null);
+  };
+
   const dismissStatus = () => setStatus(null);
 
   return (
@@ -125,6 +130,17 @@ function MagicInput({ onAnalyze }) {
         >
           {isLoading ? "Analyzing…" : "Analyze with AI"}
         </Button>
+
+        {Boolean(story.trim()) && !isLoading && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="md"
+            onClick={handleClear}
+          >
+            Clear Text
+          </Button>
+        )}
 
         {isLoading && (
           <span className="magic-input-hint" aria-live="polite">

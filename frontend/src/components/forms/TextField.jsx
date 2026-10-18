@@ -14,6 +14,7 @@ function TextField({ field, register, error }) {
       disabled={field.disabled}
       helperText={field.helperText || field.description}
       error={error}
+      className="form-field"
       {...register(field.name, rules)}
     />
   );

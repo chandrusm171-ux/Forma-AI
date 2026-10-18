@@ -9,11 +9,19 @@ function ConditionalField({ field, values, children }) {
   const currentValue = values?.[condition.field];
 
   switch (condition.operator) {
-    case "equals":
+    case "equals": {
+      if (typeof condition.value === "boolean") {
+        return Boolean(currentValue) === condition.value ? children : null;
+      }
       return currentValue === condition.value ? children : null;
+    }
 
-    case "notEquals":
+    case "notEquals": {
+      if (typeof condition.value === "boolean") {
+        return Boolean(currentValue) !== condition.value ? children : null;
+      }
       return currentValue !== condition.value ? children : null;
+    }
 
     case "contains":
       return Array.isArray(currentValue) &&
