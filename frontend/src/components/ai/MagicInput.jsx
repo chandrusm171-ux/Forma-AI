@@ -12,7 +12,7 @@ import { Button, ProgressBar } from "../ui";
  *
  * @param {{ onAnalyze: (story: string) => Promise<void> }} props
  */
-function MagicInput({ onAnalyze }) {
+function MagicInput({ onAnalyze, title = "Describe Your Incident", description, placeholder }) {
   const [story, setStory] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState(null); // { type: 'success' | 'error', message: string }
@@ -56,11 +56,8 @@ function MagicInput({ onAnalyze }) {
       aria-label="AI Natural Language Input"
     >
       <div className="magic-input-header">
-        <h2>Describe Your Incident</h2>
-        <p>
-          Tell us what happened in your own words. The AI will automatically
-          extract and fill the relevant form fields for you.
-        </p>
+        <h2>{title}</h2>
+        <p>{description || "Tell us what happened in your own words. AI will suggest values for the relevant form fields."}</p>
       </div>
 
       {/* ── Status banner (success / error) ── */}
@@ -101,7 +98,7 @@ function MagicInput({ onAnalyze }) {
         id="magic-story-input"
         value={story}
         onChange={(event) => setStory(event.target.value)}
-        placeholder="Example: I hit a deer yesterday evening on Route 9 in my Honda City. The windshield cracked and the front bumper was damaged."
+        placeholder={placeholder || "Example: I hit a deer yesterday evening on Route 9 in my Honda City. The windshield cracked and the front bumper was damaged."}
         rows={5}
         disabled={isLoading}
         aria-label="Incident description"

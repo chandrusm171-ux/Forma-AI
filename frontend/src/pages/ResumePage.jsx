@@ -79,11 +79,11 @@ function ResumePage() {
           <span className="home-eyebrow">DOCUMENT EXTRACTION</span>
           <h1 id="resume-title">Resume Parser</h1>
           <p>
-            Upload a resume to prepare it for structured extraction. The AI
-            parsing service can be connected here when the backend extraction
-            endpoint is available.
+            Resume parsing is planned as a follow-up milestone. This page previews the upload experience, but document extraction is not enabled in this release yet.
           </p>
         </div>
+
+        <div className="resume-coming-soon" role="status"><span aria-hidden="true">✦</span><div><strong>Document extraction is not active yet</strong><p>Upload validation, PDF/DOCX text extraction, and structured resume mapping are planned for a later phase.</p></div></div>
 
         <div className="resume-upload-card">
           {/* ── Loading overlay while parsing ── */}
@@ -132,7 +132,7 @@ function ResumePage() {
               type="button"
               variant="primary"
               size="md"
-              disabled={!fileName}
+              disabled
               isLoading={isParsing}
               onClick={handleParse}
               leftIcon={
@@ -143,7 +143,7 @@ function ResumePage() {
                 </svg>
               }
             >
-              {isParsing ? "Parsing…" : "Parse Resume"}
+              {isParsing ? "Parsing…" : "Resume parsing coming soon"}
             </Button>
             {Boolean(fileName) && !isParsing && (
               <Button

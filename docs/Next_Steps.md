@@ -1,88 +1,58 @@
-# Forma-AI — Next Steps
+# Forma AI — Next Steps
 
-## Current milestone: Phase 3 — Local AI integration and end-to-end verification
+## Phase 3 — Blend and verify the AI workflows
 
-The current backend supports OpenAI-compatible Chat Completions and can use Ollama locally. The base URL normalizer turns `http://localhost:11434/v1` into `http://localhost:11434/v1/chat/completions`. Ollama is local and does not require paid OpenAI API credits.
+- [ ] Install backend dependencies with `npm ci`.
+- [ ] Confirm `ollama list` includes `llama3.2` and the local API responds.
+- [ ] Set `AI_PROVIDER=ollama`, `OLLAMA_MODEL=llama3.2`, and the correct `OLLAMA_BASE_URL` in `backend/.env`.
+- [ ] Run `npm test` in `backend/`.
+- [ ] Start the backend and test `POST /api/ai/extract` for each supported `schemaId`.
+- [ ] Start the frontend and test the five workflows from the Home page.
+- [ ] Verify AI suggestions prefill only valid fields, and conditional fields respond correctly.
+- [ ] Submit each workflow and confirm MongoDB persistence.
+- [ ] Run frontend `npm run lint` and `npm run build` on Windows.
+- [ ] Test responsive layouts and keyboard focus on mobile, tablet, and desktop widths.
 
-### Step 1 — Configure Ollama
+## Included workflows
 
-In the private `backend/.env`, configure:
+- `insurance-claim`
+- `patient-intake`
+- `personal-loan`
+- `legal-intake`
+- `job-application`
 
-```env
-OPENAI_BASE_URL=http://localhost:11434/v1
-OPENAI_API_KEY=ollama-local
-OPENAI_MODEL=llama3.2
-```
+Frontend starter schemas and the backend AI schema catalog must remain aligned. When changing a field, update both definitions and add/adjust tests.
 
-Keep the existing MongoDB URI and other variables. Do not commit or share `.env`.
+## Phase 4 — Security and reliability
 
-### Step 2 — Run backend tests and server
+- Add route-level tests for AI success, timeout, malformed model output, unavailable Ollama, and unsupported schema IDs.
+- Add rate limiting to AI extraction and cap request size.
+- Avoid logging full incident descriptions or other personal data.
+- Validate model output against field types, enum options, and date formats before prefill and before persistence.
+- Add authentication and authorization before exposing stored forms or submissions to multiple users.
+- Add CI checks for backend tests, frontend lint, and frontend build.
+- Clearly label AI values as suggestions and require user review.
 
-```powershell
-cd backend
-npm test
-npm run dev
-```
+## Phase 5 — Resume parsing
 
-Keep the backend terminal open. Confirm it listens on port 5000. MongoDB should report connected for database-backed tests.
+Resume parsing is intentionally not implemented yet. Before enabling it, add secure upload handling, size limits, MIME/extension checks, file signature validation, PDF/DOC/DOCX text extraction, and tests for malformed or unsafe files. Do not report a successful parse until actual extracted data is returned.
 
-### Step 3 — Test the AI API
+## Phase 6 — Team workflow and deployment
 
-Run this from a second PowerShell terminal:
+- Review `git status` and `git diff --check`.
+- Keep `.env`, `.env.local`, `node_modules`, `dist`, and credentials out of commits and shared ZIPs.
+- Commit source, tests, and documentation only.
+- Push `feature/chandru-frontend` and open a pull request into `develop`.
+- Deploy only after the production environment variables, database access rules, and error handling have been reviewed.
 
-```powershell
-$body = @{
-  text = "My Honda City hit a deer. The front bumper was damaged."
-  schemaId = "insurance-claim"
-} | ConvertTo-Json
-
-Invoke-RestMethod `
-  -Method Post `
-  -Uri "http://localhost:5000/api/ai/extract" `
-  -ContentType "application/json" `
-  -Body $body
-```
-
-Expected: HTTP success and a `success: true` response with supported extracted fields. Model wording and optional fields can vary; the user must review the result.
-
-### Step 4 — Verify the frontend flow
-
-- Start the frontend using `npm run dev` in `frontend/`.
-- Open the Form page and enter a short incident description.
-- Select Analyze with AI.
-- Confirm loading/error feedback works and extracted values prefill the correct fields.
-- Confirm the conditional fields update from extracted values.
-- Correct any AI mistakes manually before submission.
-
-### Step 5 — Verify persistence
-
-- Submit the completed insurance form.
-- Confirm the API returns a successful submission response.
-- Confirm the saved submission can be retrieved through the backend API.
-- Test a missing/invalid field and verify validation messages.
-
-### Step 6 — Frontend quality checks
+## Git workflow
 
 ```powershell
-cd frontend
-npm run lint
-npm run build
+git status
+git diff --check
+git add README.md docs backend frontend
+git commit -m "Blend AI workflows and modernize Forma UI"
+git push origin feature/chandru-frontend
 ```
 
-Fix any errors before opening a pull request.
-
-
-## Troubleshooting
-
-- **`AI_PROVIDER_REJECTED`**: confirm Ollama is running, the model exists (`ollama list`), and the configured base URL is `http://localhost:11434/v1`.
-- **Connection refused**: start Ollama and test `http://localhost:11434/v1/chat/completions`.
-- **Invalid JSON response**: inspect the returned model content and improve the extraction prompt/normalizer without accepting unsupported fields.
-- **MongoDB unavailable**: check the Atlas URI, database user/password, and network access. Keep TLS verification enabled.
-- **Frontend cannot reach backend**: confirm port 5000 is running and the frontend API base URL is correct.
-
-## Later milestones
-
-1. Improve structured extraction reliability and add an integration test against a running local Ollama instance.
-2. Add authentication/authorization and rate limiting before any public deployment.
-3. Implement resume parsing as a separate feature with secure file validation and document text extraction.
-4. Prepare deployment configuration and secret management only after local end-to-end verification is complete.
+Before sharing any archive, exclude `.git`, all real `.env` files, dependencies, and build output. If a database password or API key has been shared in a screenshot/archive, rotate it.

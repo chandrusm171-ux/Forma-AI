@@ -1,75 +1,37 @@
 # Project Structure
 
 ## Overview
-Forma-AI is an AI-augmented dynamic form engine. This document outlines the repository structure.
+Forma AI is an AI-assisted dynamic form engine. This blended release keeps the latest team project as its base and brings in the schema-aware local Ollama integration, type-safe extraction, five workflow templates, and a modern responsive visual system.
 
 ```text
 Forma-AI/
-├── frontend/                 # React 19 + Vite frontend
-├── backend/                  # Node.js + Express backend
-├── docs/                     # Project documentation
-│   ├── Project_Structure.md  # Folder structure & team roles
-│   ├── Frontend.md           # React components & UI guide
-│   ├── Backend.md            # Backend setup & API documentation
-│   └── Next_Steps.md         # Phase 3 checklist and follow-up roadmap
+├── frontend/                 # React + Vite dynamic form experience
+├── backend/                  # Express API, MongoDB, AI extraction
+├── docs/                     # Architecture, setup, and next steps
 └── README.md
 ```
 
----
-
-## Directory Roles
-
-- **`frontend/`**: Dynamic form rendering using `react-hook-form`, UI components, and state management.
-- **`backend/`**: Express API, MongoDB persistence, and AI extraction provider integration.
-- **`docs/`**: Documentation and architecture notes.
-
----
-
-## Team Responsibilities
+## Responsibilities
 
 | Member | Role | Responsibilities |
 |---|---|---|
-| **Chandru** | Team Lead | Frontend, Database / Testing, and AI integration |
-| **Khushi** | Backend Developer | Express APIs & DB Integration |
-| **Vishal** | Frontend & Docs | UI Components, Styling & Documentation |
+| Chandru | Team Lead | Frontend, database/testing, AI integration |
+| Khushi | Backend Developer | Express APIs and database integration |
+| Vishal | Frontend Support / Docs | UI components, styling, documentation |
 
----
+## Main capabilities
 
-## Current Stabilization Work
+- Schema-driven forms with client-side validation and conditional fields.
+- AI-assisted structured extraction through Ollama by default or an OpenAI-compatible provider.
+- Five starter workflows: insurance claim, patient intake, personal loan, legal intake, and job application.
+- Reviewable AI-prefilled fields; AI output is not treated as verified fact.
+- MongoDB-backed submissions, health/readiness endpoints, and explicit unavailable states.
+- Responsive UI with ambient animated gradients, floating workflow preview, staggered cards, hover transitions, and reduced-motion support.
 
-- Split Express app configuration into `backend/app.js` and process startup into `backend/server.js`.
-- Added separate liveness (`GET /api/health`) and readiness (`GET /api/ready`) checks.
-- Added safe initial MongoDB connection retries without disabling TLS verification.
-- Added HTTP smoke tests for health, readiness, invalid JSON, and unknown routes.
-- MongoDB Atlas TLS alert 80 remains an external connection issue to resolve; database-dependent features stay unavailable until a secure connection succeeds.
+## Important implementation notes
 
-## Phase 2 — AI Incident Extraction
-
-- Replaced the `/api/ai/extract` placeholder with an OpenAI-compatible Chat Completions integration using server-side environment configuration.
-- Added request limits, supported-schema allowlisting, structured JSON parsing, field/type allowlisting, safe provider errors, and timeout handling.
-- The frontend already calls `/api/ai/extract`; extracted values can prefill the insurance claim form after the provider key is configured.
-- Resume parsing remains a separate follow-up feature and is explicitly marked as not implemented.
-
-## Daily Progress Tracker
-
-- **Day 1**: Initialized Vite + React 19 environment, planned dynamic form engine and core schemas.
-- **Day 2**: Planned reusable component hierarchy, responsive styling strategy, and documentation structure.
-- **Day 3**: Implemented and improved reusable React UI components (`Button`, `Input`, `Loading`), integrated layout shells (`Navbar`, `PageLayout`), and verified components locally.
-- **Day 4**: Developed main pages (`Home`, `FormPage`, `ResumePage`), integrated reusable React components, and refined styling (spacing scale, Inter font typography, alignment, focus rings, and overall UI consistency).
-- **Day 5**: Implemented comprehensive responsive layouts for mobile (≤ 480 px), tablet (481–768 px), and desktop (769 px+). Added animated hamburger menu for mobile navigation, fluid typography, and tested the UI at multiple viewport widths (320 px – 1920 px). Updated all documentation.
-- **Day 6**: Added and improved loading states and user feedback for all asynchronous frontend operations. Created new UI primitives (`Toast`, `Skeleton`, `ProgressBar`). Enhanced `MagicInput`, `DynamicForm`, `FormPage`, and `ResumePage` with loading overlays, progress bars, status banners, and toast notifications. Updated documentation.
-- **Day 7**: Added user-friendly error, empty, and fallback states (`ErrorState`, `EmptyState`) to improve the frontend user experience. Updated documentation to reflect these changes.
-- **Day 8**: Frontend support — Worked on frontend integration and resolved UI and integration issues found during development.
-- **Day 9**: UI refactoring — Refactored frontend components and improved code organization, readability, and maintainability. Centralized schema validation rules, added module barrel exports, eliminated redundant error states, and organized service layers.
-
-- **Day 10**: UI Refactoring — Refactored frontend components and improved code organization, readability, and maintainability. Created root barrel exports (`components/index.js`, `pages/index.js`), standardized clean component imports across all pages (`Home`, `FormPage`, `ResumePage`, `App`), unified form field validation in `CheckboxField`, and documented component architecture.
-- **Day 10 (Backend & API)**: Aligned the frontend form service with backend routes, added persisted form submissions and API/database-aware health reporting, established explicit AI endpoint contracts, and added backend validation tests.
-- **Day 11**: UI Consistency & Documentation — Improved consistency across pages, components, buttons, forms, and user interactions. Standardized page headers and semantic landmarks across `Home`, `FormPage`, and `ResumePage`. Unified button hover, elevation, and active states across all variants (`primary`, `secondary`, `outline`, `ghost`, `danger`). Achieved full prop parity (`disabled`, `helperText`, `required`) across all form components (`TextField`, `SelectField`, `TextareaField`, `CheckboxField`) matching the `Input` UI primitive. Polished dismiss controls (`type="button"`, hover scaling, focus rings) on Toast and status banners, added responsive mobile action stacking for `.form-submit-actions`, and updated comprehensive frontend/backend documentation.
-
-
-## Phase 3 — Local Ollama Integration
-
-- Added Chat Completions URL normalization so a base URL ending in `/v1` is correctly resolved to `/v1/chat/completions`.
-- Documented local Ollama settings so development does not require paid OpenAI API credits.
-- Added automated tests for Ollama endpoint URL resolution and request routing.
-- Next: verify AI extraction end-to-end in the React form, verify MongoDB submission persistence, run frontend lint/build, then commit and open a pull request into `develop`.
+- Keep frontend schemas in `frontend/src/schemas/formSchema.js` aligned with the backend `SCHEMA_CATALOG` in `backend/services/aiExtractionService.js`.
+- AI extraction currently supports these five schemas; adding a UI template alone does not automatically add backend extraction support.
+- Resume parsing remains unimplemented and explicitly returns a `501` response.
+- Preserve TLS verification for MongoDB Atlas. Do not use insecure TLS flags as a workaround.
+- Do not commit `.env` files, credentials, dependencies, or build output.

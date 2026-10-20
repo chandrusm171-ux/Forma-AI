@@ -111,48 +111,89 @@ test("AI provider failures are returned as safe errors", async () => {
 });
 
 
-test("Ollama base URL is normalized to the Chat Completions endpoint", () => {
+test("Chat Completions URL resolver accepts a base URL or a complete endpoint", () => {
   assert.equal(
     resolveChatCompletionsUrl("http://localhost:11434/v1"),
     "http://localhost:11434/v1/chat/completions"
   );
-});
-
-test("Chat Completions URL is not appended twice", () => {
   assert.equal(
-    resolveChatCompletionsUrl("http://localhost:11434/v1/chat/completions/"),
+    resolveChatCompletionsUrl("http://localhost:11434/v1/"),
+    "http://localhost:11434/v1/chat/completions"
+  );
+  assert.equal(
+    resolveChatCompletionsUrl("http://localhost:11434/v1/chat/completions"),
+    "http://localhost:11434/v1/chat/completions"
+  );
+  assert.equal(
+    resolveChatCompletionsUrl("http://localhost:11434"),
     "http://localhost:11434/v1/chat/completions"
   );
 });
 
-test("host-only compatible provider URLs receive the standard v1 endpoint", () => {
-  assert.equal(
-    resolveChatCompletionsUrl("https://api.example.test"),
-    "https://api.example.test/v1/chat/completions"
-  );
+test("AI normalization rejects wrong primitive types and invalid dates", () => {
+  const result = normalizeExtractedData({
+    vehicle: true,
+    hasDamage: "yes",
+    incidentDate: "yesterday",
+    description: "  A deer hit the vehicle.  ",
+    damageDescription: 123,
+  }, {
+    fields: {
+      vehicle: "string or null",
+      hasDamage: "boolean or null",
+      incidentDate: "string (YYYY-MM-DD) or null",
+      description: "string or null",
+      damageDescription: "string or null",
+    },
+  });
+
+  assert.deepEqual(result, {
+    description: "A deer hit the vehicle.",
+  });
 });
 
-test("AI extraction posts to the resolved Chat Completions URL", async () => {
-  let requestedUrl;
-  const fetchImpl = async (url, options) => {
-    requestedUrl = url;
+
+test("all five starter workflows are available to the AI extraction service", () => {
+  const { listSupportedSchemas } = require("../services/aiExtractionService");
+  assert.deepEqual(listSupportedSchemas().map((item) => item.id), [
+    "insurance-claim",
+    "patient-intake",
+    "personal-loan",
+    "legal-intake",
+    "job-application",
+  ]);
+});
+
+test("AI extraction uses the selected workflow schema", async () => {
+  let requestBody;
+  const fetchImpl = async (_url, options) => {
+    requestBody = JSON.parse(options.body);
     return {
       ok: true,
       status: 200,
       json: async () => ({
-        choices: [{ message: { content: JSON.stringify({ vehicle: "Honda City" }) } }],
+        choices: [{ message: { content: JSON.stringify({
+          fullName: "Jamie Doe",
+          chiefComplaint: "A persistent headache for two days",
+          symptomDuration: "1_3_days",
+          painLevel: "4-6",
+          hasAllergies: false,
+        }) } }],
       }),
     };
   };
 
-  await extractFormData(
-    { text: "My Honda City was damaged." },
-    {
-      apiKey: "ollama-local",
-      baseUrl: "http://localhost:11434/v1",
-      fetchImpl,
-    }
+  const result = await extractFormData(
+    { text: "Jamie has had a headache for two days, moderate pain, no known allergies.", schemaId: "patient-intake" },
+    { apiKey: "ollama-local", baseUrl: "http://localhost:11434/v1", fetchImpl }
   );
 
-  assert.equal(requestedUrl, "http://localhost:11434/v1/chat/completions");
+  assert.match(requestBody.messages[0].content, /Patient Intake/);
+  assert.deepEqual(result, {
+    fullName: "Jamie Doe",
+    chiefComplaint: "A persistent headache for two days",
+    symptomDuration: "1_3_days",
+    painLevel: "4-6",
+    hasAllergies: false,
+  });
 });
