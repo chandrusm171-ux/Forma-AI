@@ -8,7 +8,7 @@
 - **CORS**: Configurable origin allowlist (`FRONTEND_ORIGIN`)
 - **Testing**: Node.js built-in test runner (`node --test`)
 
-The AI extraction service uses Node.js `fetch()` with an OpenAI-compatible Chat Completions API. It does not yet use LangChain; the provider boundary is isolated in `services/aiExtractionService.js` so it can be replaced or wrapped with LangChain later. `OPENAI_BASE_URL` may be a base URL such as `http://localhost:11434/v1`; the service normalizes it to `/chat/completions`.
+The AI extraction service uses Node.js `fetch()` with an OpenAI-compatible Chat Completions API. Ollama is the default local provider, so no paid API key is needed for local development. The provider boundary is isolated in `services/aiExtractionService.js`; LangChain is not currently required.
 
 ---
 
@@ -79,9 +79,12 @@ Copy-Item .env.example .env
 | `MONGODB_URI` | MongoDB connection string (Local or Atlas) | `mongodb://127.0.0.1:27017/forma-ai` |
 | `FRONTEND_ORIGIN` | Comma-separated list of allowed frontend origins for CORS | `http://localhost:5173,http://127.0.0.1:5173` |
 | `DB_RETRY_INTERVAL_MS` | Delay between retries after an initial Atlas connection failure (minimum 5000 ms) | `15000` |
-| `OPENAI_API_KEY` | Server-side key for the AI extraction provider | Required for AI extraction |
-| `OPENAI_MODEL` | Model name accepted by the configured provider | `gpt-4o-mini` |
-| `OPENAI_BASE_URL` | Optional OpenAI-compatible API base URL or full Chat Completions URL | `https://api.openai.com/v1` by default |
+| `AI_PROVIDER` | Select `ollama` (default) or `openai` | `ollama` |
+| `OLLAMA_BASE_URL` | Ollama base URL or full Chat Completions endpoint | `http://localhost:11434/v1/chat/completions` |
+| `OLLAMA_MODEL` | Model installed in Ollama | `llama3.2` |
+| `OPENAI_API_KEY` | Server-side key when `AI_PROVIDER=openai` | Required only for cloud OpenAI |
+| `OPENAI_MODEL` | Cloud model name | `gpt-4o-mini` |
+| `OPENAI_BASE_URL` | Optional OpenAI-compatible base URL or full endpoint | `https://api.openai.com/v1/chat/completions` |
 
 ### Sample `.env` Setup:
 
@@ -91,15 +94,15 @@ PORT=5000
 MONGODB_URI=mongodb://127.0.0.1:27017/forma-ai
 FRONTEND_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
 DB_RETRY_INTERVAL_MS=15000
-OPENAI_API_KEY=
-OPENAI_MODEL=gpt-4o-mini
-# Optional OpenAI-compatible API base URL:
-# OPENAI_BASE_URL=https://api.openai.com/v1
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434/v1/chat/completions
+OLLAMA_MODEL=llama3.2
 
-# Local Ollama (free local inference; Ollama must be running):
-# OPENAI_API_KEY=ollama-local
-# OPENAI_MODEL=llama3.2
-# OPENAI_BASE_URL=http://localhost:11434/v1
+# To use a cloud OpenAI-compatible provider instead:
+# AI_PROVIDER=openai
+# OPENAI_API_KEY=your_key_here
+# OPENAI_MODEL=gpt-4o-mini
+# OPENAI_BASE_URL=https://api.openai.com/v1/chat/completions
 ```
 
 #### 2. MongoDB Atlas (Cloud):
@@ -152,7 +155,7 @@ npm test
 | **DELETE** | `/api/forms/:id` | `requireDatabase` | Deletes a form schema by its ID | `200 OK` |
 | **POST** | `/api/submissions` | `requireDatabase` | Validates and persists a completed form submission | `201 Created` |
 | **GET** | `/api/submissions/:id` | `requireDatabase` | Retrieves a form submission by its ID | `200 OK` |
-| **POST** | `/api/ai/extract` | None | AI field extraction from natural language (requires provider key) | `200`, `400`, `429`, `502`, `503`, or `504` |
+| **POST** | `/api/ai/extract` | None | AI field extraction from natural language (local Ollama by default) | `200`, `400`, `429`, `502`, `503`, or `504` |
 | **POST** | `/api/ai/parse-resume` | None | Resume parser placeholder | `501 Not Implemented` |
 
 ---
@@ -219,7 +222,7 @@ The frontend sends:
 }
 ```
 
-When `OPENAI_API_KEY` is configured, the backend sends a structured extraction prompt to the configured OpenAI-compatible Chat Completions endpoint. For Ollama, a placeholder key such as `ollama-local` is accepted by the local OpenAI-compatible endpoint; no OpenAI credits are needed. The response is parsed and normalized against the allowlisted insurance-claim fields. Unknown fields and unsupported incident types are discarded. Unknown values are omitted instead of fabricated. The UI must let the user review and correct extracted values before submission.
+When `OPENAI_API_KEY` is configured, the backend sends a structured extraction prompt to the configured OpenAI-compatible Chat Completions endpoint. The response is parsed and normalized against the allowlisted insurance-claim fields. Unknown fields and unsupported incident types are discarded. Unknown values are omitted instead of fabricated. The UI must let the user review and correct extracted values before submission.
 
 If no provider key is configured, the endpoint returns HTTP `503` with `AI_SERVICE_NOT_CONFIGURED`. Provider failures return safe errors without forwarding the provider's raw response body. Request text is limited to 10,000 characters.
 
@@ -244,15 +247,3 @@ This project is currently in the development MVP phase:
 - Add authentication/authorization before exposing saved submissions or forms in production.
 - Consider a provider-specific LangChain adapter if the team needs model switching or more advanced output parsing.
 - Configure proper TLS verification and keep connection credentials in environment variables only.
-
-
-## Phase 3 — Ollama local AI verification
-
-1. Verify Ollama's model is installed with `ollama list`.
-2. Confirm `OPENAI_BASE_URL=http://localhost:11434/v1`, `OPENAI_API_KEY=ollama-local`, and `OPENAI_MODEL=llama3.2` in the private `backend/.env`.
-3. Run `npm test`, then `npm run dev`.
-4. Send a test request to `POST /api/ai/extract` with `text` and `schemaId: "insurance-claim"`.
-5. Verify the frontend's Analyze with AI flow, form prefill, conditional fields, and persisted submission.
-6. Run frontend lint/build and review the pull request.
-
-Troubleshooting: `AI_PROVIDER_REJECTED` is a generic provider response error. Check that Ollama is running and that the backend is calling `http://localhost:11434/v1/chat/completions`. Do not put provider credentials in frontend environment variables or commit `.env`.

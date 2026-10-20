@@ -7,6 +7,7 @@ function FieldRenderer({ field, register, error }) {
   switch (field.type) {
     case "text":
     case "email":
+    case "number":
       return <TextField field={field} register={register} error={error} />;
     case "select":
       return <SelectField field={field} register={register} error={error} />;

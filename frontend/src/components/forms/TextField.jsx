@@ -8,7 +8,7 @@ function TextField({ field, register, error }) {
     <Input
       id={field.name}
       label={field.label}
-      type={field.type === "email" ? "email" : "text"}
+      type={field.type === "email" ? "email" : field.type === "number" ? "number" : "text"}
       placeholder={field.placeholder || ""}
       required={field.required}
       disabled={field.disabled}

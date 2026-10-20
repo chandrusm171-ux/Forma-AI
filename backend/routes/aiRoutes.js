@@ -13,7 +13,7 @@ router.post("/extract", async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Incident details extracted. Review the values before submitting the form.",
+      message: "Suggested field values extracted. Review every value before submitting the form.",
       data,
     });
   } catch (error) {
