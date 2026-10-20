@@ -16,6 +16,7 @@ const Input = forwardRef(function Input(
     className = "",
     leftIcon,
     rightIcon,
+    badge,
     ...props
   },
   ref
@@ -27,10 +28,13 @@ const Input = forwardRef(function Input(
   return (
     <div className={`ui-input-wrapper ${hasError ? "has-error" : ""} ${className}`}>
       {label && (
-        <label htmlFor={inputId} className="ui-input-label">
-          {label}
-          {required && <span className="ui-required-mark" aria-hidden="true"> *</span>}
-        </label>
+        <div className="ui-input-label-row">
+          <label htmlFor={inputId} className="ui-input-label">
+            {label}
+            {required && <span className="ui-required-mark" aria-hidden="true"> *</span>}
+          </label>
+          {badge && <span className="ui-input-badge">{badge}</span>}
+        </div>
       )}
 
       <div className="ui-input-container">

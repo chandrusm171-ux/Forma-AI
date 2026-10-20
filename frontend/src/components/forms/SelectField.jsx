@@ -1,20 +1,24 @@
+import AiBadge from "../ui/AiBadge";
 import { buildValidationRules } from "./validation";
 
-function SelectField({ field, register, error }) {
+function SelectField({ field, register, error, isAiPrefilled }) {
   const hasError = Boolean(error);
   const errorMessage = typeof error === "string" ? error : error?.message;
   const helper = field.helperText || field.description;
 
   return (
-    <div className={`ui-input-wrapper form-field ${hasError ? "has-error" : ""}`}>
-      <label htmlFor={field.name} className="ui-input-label">
-        {field.label}
-        {field.required && (
-          <span className="ui-required-mark" aria-hidden="true">
-            {" "}*
-          </span>
-        )}
-      </label>
+    <div className={`ui-input-wrapper form-field ${isAiPrefilled ? "is-ai-prefilled" : ""} ${hasError ? "has-error" : ""}`}>
+      <div className="ui-input-label-row">
+        <label htmlFor={field.name} className="ui-input-label">
+          {field.label}
+          {field.required && (
+            <span className="ui-required-mark" aria-hidden="true">
+              {" "}*
+            </span>
+          )}
+        </label>
+        {isAiPrefilled && <AiBadge />}
+      </div>
 
       <div className="ui-input-container">
         <select

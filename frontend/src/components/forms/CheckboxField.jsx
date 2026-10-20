@@ -1,15 +1,16 @@
+import AiBadge from "../ui/AiBadge";
 import { buildValidationRules } from "./validation";
 
 /**
  * CheckboxField component for boolean/consent form inputs.
  */
-function CheckboxField({ field, register, error }) {
+function CheckboxField({ field, register, error, isAiPrefilled }) {
   const hasError = Boolean(error);
   const errorMessage = typeof error === "string" ? error : error?.message;
   const helper = field.helperText || field.description;
 
   return (
-    <div className={`form-field checkbox-field ${hasError ? "has-error" : ""}`}>
+    <div className={`form-field checkbox-field ${isAiPrefilled ? "is-ai-prefilled" : ""} ${hasError ? "has-error" : ""}`}>
       <label htmlFor={field.name}>
         <input
           id={field.name}
@@ -33,6 +34,7 @@ function CheckboxField({ field, register, error }) {
             </span>
           )}
         </span>
+        {isAiPrefilled && <AiBadge />}
       </label>
 
       {hasError && (

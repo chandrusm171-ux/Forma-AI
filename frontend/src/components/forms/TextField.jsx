@@ -1,7 +1,8 @@
 import Input from "../ui/Input";
+import AiBadge from "../ui/AiBadge";
 import { buildValidationRules } from "./validation";
 
-function TextField({ field, register, error }) {
+function TextField({ field, register, error, isAiPrefilled }) {
   const rules = buildValidationRules(field);
 
   return (
@@ -14,7 +15,8 @@ function TextField({ field, register, error }) {
       disabled={field.disabled}
       helperText={field.helperText || field.description}
       error={error}
-      className="form-field"
+      badge={isAiPrefilled ? <AiBadge /> : null}
+      className={`form-field ${isAiPrefilled ? "is-ai-prefilled" : ""}`}
       {...register(field.name, rules)}
     />
   );

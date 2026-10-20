@@ -75,9 +75,22 @@ function DynamicForm({ schema, initialValues = {}, onReset }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="form-header">
-        <h2>{schema.title}</h2>
-
-        {schema.description && <p>{schema.description}</p>}
+        <div className="form-header-title-row">
+          <div>
+            <h2>{schema.title}</h2>
+            {schema.description && <p>{schema.description}</p>}
+          </div>
+          <div className="form-header-badge-group">
+            <span className="form-completion-pill" title="Form completion status">
+              <span className="completion-dot" />
+              {schema.fields.filter((f) => {
+                const val = values?.[f.name];
+                return val !== undefined && val !== "" && val !== false;
+              }).length}{" "}
+              of {schema.fields.length} filled
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* ── Submit feedback banner ── */}
@@ -115,17 +128,25 @@ function DynamicForm({ schema, initialValues = {}, onReset }) {
       )}
 
       <fieldset disabled={isSubmitting} className="form-fieldset">
-        {schema.fields.map((field) => (
-          <ConditionalField key={field.name} field={field} values={values}>
-            <div className="form-field-wrapper">
-              <FieldRenderer
-                field={field}
-                register={register}
-                error={errors[field.name]}
-              />
-            </div>
-          </ConditionalField>
-        ))}
+        {schema.fields.map((field) => {
+          const isPrefilled =
+            initialValues &&
+            initialValues[field.name] !== undefined &&
+            initialValues[field.name] !== "";
+
+          return (
+            <ConditionalField key={field.name} field={field} values={values}>
+              <div className="form-field-wrapper">
+                <FieldRenderer
+                  field={field}
+                  register={register}
+                  error={errors[field.name]}
+                  isAiPrefilled={isPrefilled}
+                />
+              </div>
+            </ConditionalField>
+          );
+        })}
       </fieldset>
 
       <div className="form-submit-actions">

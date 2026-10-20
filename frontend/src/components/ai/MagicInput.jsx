@@ -12,7 +12,13 @@ import { Button, ProgressBar } from "../ui";
  *
  * @param {{ onAnalyze: (story: string) => Promise<void> }} props
  */
-function MagicInput({ onAnalyze, title = "Describe Your Incident", description, placeholder }) {
+function MagicInput({
+  onAnalyze,
+  title = "Describe Your Incident",
+  description,
+  placeholder,
+  samplePrompts = [],
+}) {
   const [story, setStory] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState(null); // { type: 'success' | 'error', message: string }
@@ -43,6 +49,20 @@ function MagicInput({ onAnalyze, title = "Describe Your Incident", description, 
     }
   };
 
+  const handleKeyDown = (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+      event.preventDefault();
+      if (story.trim() && !isLoading) {
+        handleAnalyze();
+      }
+    }
+  };
+
+  const handleSelectSample = (sample) => {
+    setStory(sample.text);
+    setStatus(null);
+  };
+
   const handleClear = () => {
     setStory("");
     setStatus(null);
@@ -56,9 +76,48 @@ function MagicInput({ onAnalyze, title = "Describe Your Incident", description, 
       aria-label="AI Natural Language Input"
     >
       <div className="magic-input-header">
+        <div className="magic-header-top">
+          <span className="magic-pill-tag">
+            <span className="sparkle-dot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
+                <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+              </svg>
+            </span>
+            NATURAL LANGUAGE EXTRACTION
+          </span>
+          <span className="magic-shortcut-hint">Ctrl + Enter to run</span>
+        </div>
         <h2>{title}</h2>
         <p>{description || "Tell us what happened in your own words. AI will suggest values for the relevant form fields."}</p>
       </div>
+
+      {/* ── Quick sample scenario chips ── */}
+      {samplePrompts.length > 0 && (
+        <div className="magic-samples-container">
+          <span className="magic-samples-label">Try a sample scenario:</span>
+          <div className="magic-samples-chips">
+            {samplePrompts.map((sample, idx) => (
+              <button
+                key={idx}
+                type="button"
+                className="magic-sample-chip"
+                onClick={() => handleSelectSample(sample)}
+                disabled={isLoading}
+                title="Click to populate description with this scenario"
+              >
+                <span className="sample-chip-icon" aria-hidden="true">
+                  {sample.icon || (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="13" height="13">
+                      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+                    </svg>
+                  )}
+                </span>
+                <span className="sample-chip-text">{sample.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Status banner (success / error) ── */}
       {status && (
@@ -94,20 +153,28 @@ function MagicInput({ onAnalyze, title = "Describe Your Incident", description, 
         </div>
       )}
 
-      <textarea
-        id="magic-story-input"
-        value={story}
-        onChange={(event) => setStory(event.target.value)}
-        placeholder={placeholder || "Example: I hit a deer yesterday evening on Route 9 in my Honda City. The windshield cracked and the front bumper was damaged."}
-        rows={5}
-        disabled={isLoading}
-        aria-label="Incident description"
-      />
+      <div className="magic-textarea-wrapper">
+        <textarea
+          id="magic-story-input"
+          value={story}
+          onChange={(event) => setStory(event.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder || "Example: I hit a deer yesterday evening on Route 9 in my Honda City. The windshield cracked and the front bumper was damaged."}
+          rows={5}
+          disabled={isLoading}
+          aria-label="Incident description"
+        />
+        {story.length > 0 && (
+          <div className="magic-char-counter">
+            {story.length} characters
+          </div>
+        )}
+      </div>
 
       {/* ── Indeterminate progress bar while analyzing ── */}
       {isLoading && (
         <div className="magic-input-progress">
-          <ProgressBar label="Analyzing your description…" />
+          <ProgressBar label="Analyzing your description with AI…" />
         </div>
       )}
 
@@ -141,7 +208,7 @@ function MagicInput({ onAnalyze, title = "Describe Your Incident", description, 
 
         {isLoading && (
           <span className="magic-input-hint" aria-live="polite">
-            This may take a few seconds…
+            Extracting entities and structuring fields…
           </span>
         )}
       </div>

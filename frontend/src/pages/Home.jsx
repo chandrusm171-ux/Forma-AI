@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, PageLayout } from "../components";
 
@@ -23,12 +24,128 @@ const features = [
 ];
 
 const workflows = [
-  { id: "insurance-claim", title: "Insurance claim", category: "INCIDENTS", icon: "↗", color: "mint", description: "Incident details, vehicle information, and damage" },
-  { id: "patient-intake", title: "Patient intake", category: "HEALTHCARE", icon: "+", color: "blue", description: "Visit reason and relevant intake details" },
-  { id: "personal-loan", title: "Personal loan", category: "FINANCE", icon: "$", color: "violet", description: "Purpose, employment, and request summary" },
-  { id: "legal-intake", title: "Legal intake", category: "PROFESSIONAL", icon: "§", color: "amber", description: "Matter summary, other party, and urgency" },
-  { id: "job-application", title: "Job application", category: "CAREERS", icon: "⌁", color: "rose", description: "Candidate profile and role preferences" },
+  {
+    id: "insurance-claim",
+    title: "Insurance claim",
+    category: "INCIDENTS",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2" />
+        <circle cx="7" cy="17" r="2" />
+        <path d="M9 17h6" />
+        <circle cx="17" cy="17" r="2" />
+      </svg>
+    ),
+    color: "mint",
+    description: "Incident details, vehicle information, and damage",
+  },
+  {
+    id: "patient-intake",
+    title: "Patient intake",
+    category: "HEALTHCARE",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+      </svg>
+    ),
+    color: "blue",
+    description: "Visit reason and relevant intake details",
+  },
+  {
+    id: "personal-loan",
+    title: "Personal loan",
+    category: "FINANCE",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+        <rect width="20" height="14" x="2" y="5" rx="2" />
+        <line x1="2" x2="22" y1="10" y2="10" />
+      </svg>
+    ),
+    color: "violet",
+    description: "Purpose, employment, and request summary",
+  },
+  {
+    id: "legal-intake",
+    title: "Legal intake",
+    category: "PROFESSIONAL",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+        <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+        <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+        <path d="M7 21h10" />
+        <path d="M12 3v18" />
+      </svg>
+    ),
+    color: "amber",
+    description: "Matter summary, other party, and urgency",
+  },
+  {
+    id: "job-application",
+    title: "Job application",
+    category: "CAREERS",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+        <polyline points="16 18 22 12 16 6" />
+        <polyline points="8 6 2 12 8 18" />
+      </svg>
+    ),
+    color: "rose",
+    description: "Candidate profile and role preferences",
+  },
 ];
+
+const heroPreviews = {
+  "insurance-claim": {
+    kicker: "INSURANCE CLAIM",
+    quote: "“My Honda City hit a deer on Route 9…”",
+    field1Label: "Vehicle",
+    field1Value: "Honda City",
+    field2Label: "Incident Type",
+    field2Value: "Animal collision",
+    field3Label: "Damage Description",
+    field3Value: "Front bumper & left headlight damaged…",
+  },
+  "patient-intake": {
+    kicker: "PATIENT INTAKE",
+    quote: "“Severe throbbing migraine for 3 days…”",
+    field1Label: "Patient Name",
+    field1Value: "Jane Doe",
+    field2Label: "Pain Level",
+    field2Value: "Severe (7–9)",
+    field3Label: "Main Concern",
+    field3Value: "Migraine with acute light sensitivity…",
+  },
+  "personal-loan": {
+    kicker: "PERSONAL LOAN",
+    quote: "“Need $18,000 for kitchen & bathroom renovation…”",
+    field1Label: "Loan Purpose",
+    field1Value: "Home improvement",
+    field2Label: "Requested Amount",
+    field2Value: "$18,000 USD",
+    field3Label: "Employment",
+    field3Value: "Full-time • $8,200/mo income",
+  },
+  "legal-intake": {
+    kicker: "LEGAL INTAKE",
+    quote: "“Breach of contract: client refused final $14k payment…”",
+    field1Label: "Matter Type",
+    field1Value: "Contract Dispute",
+    field2Label: "Urgency",
+    field2Value: "High urgency",
+    field3Label: "Matter Summary",
+    field3Value: "Unpaid software agreement deliverables…",
+  },
+  "job-application": {
+    kicker: "JOB APPLICATION",
+    quote: "“Senior Frontend Engineer with 5 years React experience…”",
+    field1Label: "Desired Role",
+    field1Value: "Lead React Developer",
+    field2Label: "Availability",
+    field2Value: "Two weeks",
+    field3Label: "Experience & Tech",
+    field3Value: "5 yrs React, TypeScript & State…",
+  },
+};
 
 function Home() {
   return (
@@ -101,3 +218,4 @@ function Home() {
 }
 
 export default Home;
+

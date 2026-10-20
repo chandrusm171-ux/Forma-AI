@@ -3,18 +3,18 @@ import SelectField from "./SelectField";
 import CheckboxField from "./CheckboxField";
 import TextareaField from "./TextareaField";
 
-function FieldRenderer({ field, register, error }) {
+function FieldRenderer({ field, register, error, isAiPrefilled }) {
   switch (field.type) {
     case "text":
     case "email":
     case "number":
-      return <TextField field={field} register={register} error={error} />;
+      return <TextField field={field} register={register} error={error} isAiPrefilled={isAiPrefilled} />;
     case "select":
-      return <SelectField field={field} register={register} error={error} />;
+      return <SelectField field={field} register={register} error={error} isAiPrefilled={isAiPrefilled} />;
     case "textarea":
-      return <TextareaField field={field} register={register} error={error} />;
+      return <TextareaField field={field} register={register} error={error} isAiPrefilled={isAiPrefilled} />;
     case "checkbox":
-      return <CheckboxField field={field} register={register} error={error} />;
+      return <CheckboxField field={field} register={register} error={error} isAiPrefilled={isAiPrefilled} />;
     default:
       return (
         <p role="alert">
