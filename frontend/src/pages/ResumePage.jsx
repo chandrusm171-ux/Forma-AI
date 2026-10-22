@@ -189,6 +189,7 @@ function ResumePage() {
           <label
             className={`resume-upload-area ${isDragOver ? "is-drag-over" : ""} ${fileName ? "has-file" : ""}`}
             htmlFor="resume-file"
+            aria-label="Resume upload area — drop your file here or click to browse"
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}

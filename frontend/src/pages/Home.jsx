@@ -94,58 +94,6 @@ const workflows = [
   },
 ];
 
-const heroPreviews = {
-  "insurance-claim": {
-    kicker: "INSURANCE CLAIM",
-    quote: "“My Honda City hit a deer on Route 9…”",
-    field1Label: "Vehicle",
-    field1Value: "Honda City",
-    field2Label: "Incident Type",
-    field2Value: "Animal collision",
-    field3Label: "Damage Description",
-    field3Value: "Front bumper & left headlight damaged…",
-  },
-  "patient-intake": {
-    kicker: "PATIENT INTAKE",
-    quote: "“Severe throbbing migraine for 3 days…”",
-    field1Label: "Patient Name",
-    field1Value: "Jane Doe",
-    field2Label: "Pain Level",
-    field2Value: "Severe (7–9)",
-    field3Label: "Main Concern",
-    field3Value: "Migraine with acute light sensitivity…",
-  },
-  "personal-loan": {
-    kicker: "PERSONAL LOAN",
-    quote: "“Need $18,000 for kitchen & bathroom renovation…”",
-    field1Label: "Loan Purpose",
-    field1Value: "Home improvement",
-    field2Label: "Requested Amount",
-    field2Value: "$18,000 USD",
-    field3Label: "Employment",
-    field3Value: "Full-time • $8,200/mo income",
-  },
-  "legal-intake": {
-    kicker: "LEGAL INTAKE",
-    quote: "“Breach of contract: client refused final $14k payment…”",
-    field1Label: "Matter Type",
-    field1Value: "Contract Dispute",
-    field2Label: "Urgency",
-    field2Value: "High urgency",
-    field3Label: "Matter Summary",
-    field3Value: "Unpaid software agreement deliverables…",
-  },
-  "job-application": {
-    kicker: "JOB APPLICATION",
-    quote: "“Senior Frontend Engineer with 5 years React experience…”",
-    field1Label: "Desired Role",
-    field1Value: "Lead React Developer",
-    field2Label: "Availability",
-    field2Value: "Two weeks",
-    field3Label: "Experience & Tech",
-    field3Value: "5 yrs React, TypeScript & State…",
-  },
-};
 
 function Home() {
   return (

@@ -84,10 +84,30 @@ function DynamicForm({ schema, initialValues = {}, onReset }) {
             <span className="form-completion-pill" title="Form completion status">
               <span className="completion-dot" />
               {schema.fields.filter((f) => {
+                // Only count fields that are actually visible (condition satisfied or absent)
+                if (f.condition) {
+                  const condVal = values?.[f.condition.field];
+                  if (f.condition.operator === "equals") {
+                    const match = typeof f.condition.value === "boolean"
+                      ? Boolean(condVal) === f.condition.value
+                      : condVal === f.condition.value;
+                    if (!match) return false;
+                  }
+                }
                 const val = values?.[f.name];
                 return val !== undefined && val !== "" && val !== false;
               }).length}{" "}
-              of {schema.fields.length} filled
+              of {schema.fields.filter((f) => {
+                if (f.condition) {
+                  const condVal = values?.[f.condition.field];
+                  if (f.condition.operator === "equals") {
+                    return typeof f.condition.value === "boolean"
+                      ? Boolean(condVal) === f.condition.value
+                      : condVal === f.condition.value;
+                  }
+                }
+                return true;
+              }).length} filled
             </span>
           </div>
         </div>

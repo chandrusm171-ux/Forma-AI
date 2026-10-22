@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { checkBackendHealth } from "../../services/api";
 
@@ -49,7 +49,7 @@ function Navbar({ brandName = "Forma AI" }) {
   }, [mobileOpen]);
 
   /* Check backend health when the application loads */
-  const loadBackendStatus = async () => {
+  const loadBackendStatus = useCallback(async () => {
     setBackendStatus("checking");
     try {
       const health = await checkBackendHealth();
@@ -65,11 +65,11 @@ function Navbar({ brandName = "Forma AI" }) {
       console.error("Backend health check failed:", error);
       setBackendStatus("offline");
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadBackendStatus();
-  }, []);
+  }, [loadBackendStatus]);
 
   const getNavClass = ({ isActive }) =>
     `nav-link${isActive ? " active" : ""}`;

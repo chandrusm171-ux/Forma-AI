@@ -162,7 +162,7 @@ function MagicInput({
           placeholder={placeholder || "Example: I hit a deer yesterday evening on Route 9 in my Honda City. The windshield cracked and the front bumper was damaged."}
           rows={5}
           disabled={isLoading}
-          aria-label="Incident description"
+          aria-label={title}
         />
         {story.length > 0 && (
           <div className="magic-char-counter">

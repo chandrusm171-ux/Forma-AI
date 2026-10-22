@@ -37,7 +37,8 @@ function ConditionalField({ field, values, children }) {
         : null;
 
     default:
-      return null;
+      // Unknown operator — fail open so fields are never silently hidden
+      return children;
   }
 }
 
