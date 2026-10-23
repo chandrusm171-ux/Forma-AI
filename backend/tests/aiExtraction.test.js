@@ -197,3 +197,54 @@ test("AI extraction uses the selected workflow schema", async () => {
     hasAllergies: false,
   });
 });
+
+
+test("AI extraction maps provider timeout to a safe 504 error", async () => {
+  const timeoutFetch = async () => {
+    const error = new Error("aborted");
+    error.name = "AbortError";
+    throw error;
+  };
+  await assert.rejects(
+    extractFormData(
+      { text: "My vehicle was damaged." },
+      { apiKey: "test-key", fetchImpl: timeoutFetch, timeoutMs: 1 }
+    ),
+    (error) => error instanceof AIServiceError &&
+      error.statusCode === 504 &&
+      error.code === "AI_PROVIDER_TIMEOUT"
+  );
+});
+
+test("AI extraction maps an unavailable local provider to a safe error", async () => {
+  const offlineFetch = async () => { throw new Error("private host detail"); };
+  await assert.rejects(
+    extractFormData(
+      { text: "My vehicle was damaged." },
+      { apiKey: "test-key", baseUrl: "http://localhost:11434/v1", fetchImpl: offlineFetch }
+    ),
+    (error) => error instanceof AIServiceError &&
+      error.statusCode === 502 &&
+      error.code === "AI_PROVIDER_UNREACHABLE" &&
+      !error.message.includes("private host detail")
+  );
+});
+
+test("AI extraction rejects malformed JSON returned by the model", async () => {
+  await assert.rejects(
+    extractFormData(
+      { text: "My vehicle was damaged." },
+      {
+        apiKey: "test-key",
+        fetchImpl: async () => ({
+          ok: true,
+          status: 200,
+          json: async () => ({ choices: [{ message: { content: "not valid JSON" } }] }),
+        }),
+      }
+    ),
+    (error) => error instanceof AIServiceError &&
+      error.code === "AI_PROVIDER_ERROR" &&
+      /valid JSON/.test(error.message)
+  );
+});

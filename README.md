@@ -9,7 +9,8 @@ Forma AI is an AI-assisted dynamic form engine. Users describe information in na
 - Local Ollama support by default, plus an optional OpenAI-compatible provider configuration.
 - Schema-aware extraction that rejects unknown fields, mismatched primitive types, and invalid enum/date values.
 - Animated, responsive UI refresh: ambient gradient motion, glass surfaces, floating workflow preview, hover transitions, staggered cards, and reduced-motion support.
-- Updated setup and Phase 3 verification checklist.
+- Added configurable AI extraction rate limiting, timeout/provider failure tests, and GitHub Actions CI.
+- Updated setup and Phase 4 security/reliability checklist.
 
 ## Team roles
 
@@ -102,9 +103,10 @@ The endpoint returns suggestions only. Users should review every value before su
 1. Run backend tests and verify all five workflow extraction paths with Ollama.
 2. Verify form prefill, conditional fields, submission persistence, and API errors.
 3. Run frontend lint and production build on Windows.
-4. Add request throttling and authentication/authorization before handling real multi-user data.
-5. Implement safe resume parsing as a separate milestone.
-6. Commit source/docs/tests only, push the feature branch, and open a PR into `develop`.
+4. Complete live Ollama + MongoDB end-to-end verification.
+5. Add authentication/authorization before exposing stored forms/submissions to multiple users.
+6. Implement safe resume parsing as a separate milestone.
+7. Commit source/docs/tests only, push the feature branch, and open a PR into `develop`.
 
 ## Security notes
 
@@ -112,3 +114,5 @@ The endpoint returns suggestions only. Users should review every value before su
 - Never commit `.env`, `.env.local`, `node_modules`, or build output.
 - Rotate any database credential that has been included in a screenshot or shared archive.
 - AI output is untrusted input and must be reviewed by a person.
+- The included AI rate limiter is in-memory and per backend process; use a shared store for multi-instance deployments.
+- Do not expose form/submission endpoints publicly until authentication and authorization are implemented.

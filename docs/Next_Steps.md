@@ -2,9 +2,7 @@
 
 ## Phase 3 — Blend and verify the AI workflows
 
-- [ ] Install backend dependencies with `npm ci`.
 - [ ] Confirm `ollama list` includes `llama3.2` and the local API responds.
-- [ ] Set `AI_PROVIDER=ollama`, `OLLAMA_MODEL=llama3.2`, and the correct `OLLAMA_BASE_URL` in `backend/.env`.
 - [ ] Run `npm test` in `backend/`.
 - [ ] Start the backend and test `POST /api/ai/extract` for each supported `schemaId`.
 - [ ] Start the frontend and test the five workflows from the Home page.
@@ -13,25 +11,38 @@
 - [ ] Run frontend `npm run lint` and `npm run build` on Windows.
 - [ ] Test responsive layouts and keyboard focus on mobile, tablet, and desktop widths.
 
-## Included workflows
+## Phase 4 — Security and reliability (this update)
 
-- `insurance-claim`
-- `patient-intake`
-- `personal-loan`
-- `legal-intake`
-- `job-application`
+### Implemented in this release
 
-Frontend starter schemas and the backend AI schema catalog must remain aligned. When changing a field, update both definitions and add/adjust tests.
+- Added configurable in-memory rate limiting to `POST /api/ai/extract`.
+- Added `RateLimit-*` and `Retry-After` headers and a structured 429 response.
+- Added tests for rate-limit allowance, blocking, reset windows, and separate clients.
+- Added AI service tests for provider timeout, unreachable provider, and malformed model JSON.
+- Set `Cache-Control: no-store` on AI extraction responses.
+- Added a GitHub Actions workflow to run backend tests, frontend lint, and frontend build on pull requests and pushes.
+- Fixed existing frontend lint errors in the navigation health-check effect and an unused import.
 
-## Phase 4 — Security and reliability
+### Still required before production or multi-user use
 
-- Add route-level tests for AI success, timeout, malformed model output, unavailable Ollama, and unsupported schema IDs.
-- Add rate limiting to AI extraction and cap request size.
-- Avoid logging full incident descriptions or other personal data.
-- Validate model output against field types, enum options, and date formats before prefill and before persistence.
-- Add authentication and authorization before exposing stored forms or submissions to multiple users.
-- Add CI checks for backend tests, frontend lint, and frontend build.
-- Clearly label AI values as suggestions and require user review.
+- [ ] Add authentication and authorization before exposing stored forms/submissions. Submission lookup is currently not a substitute for access control.
+- [ ] Consider a shared rate-limit store (such as Redis) before running multiple backend instances. The included limiter is in-memory and resets on server restart.
+- [ ] Configure trusted proxy handling only when deployed behind a known proxy; do not blindly trust forwarded IP headers.
+- [ ] Add CSRF protections if cookie-based authentication is introduced.
+- [ ] Review retention, deletion, and access policies for personal/health/financial/legal data.
+- [ ] Perform an end-to-end test against a running Ollama instance and MongoDB.
+- [ ] Verify the frontend production build on Windows and ensure CI passes.
+
+### Rate limit configuration
+
+In `backend/.env`:
+
+```env
+AI_RATE_LIMIT_WINDOW_MS=60000
+AI_RATE_LIMIT_MAX=10
+```
+
+This default permits up to 10 AI extraction requests per client in a 60-second window. Tune it to your usage and hardware.
 
 ## Phase 5 — Resume parsing
 
@@ -43,15 +54,15 @@ Resume parsing is intentionally not implemented yet. Before enabling it, add sec
 - Keep `.env`, `.env.local`, `node_modules`, `dist`, and credentials out of commits and shared ZIPs.
 - Commit source, tests, and documentation only.
 - Push `feature/chandru-frontend` and open a pull request into `develop`.
-- Deploy only after the production environment variables, database access rules, and error handling have been reviewed.
+- Deploy only after the production environment variables, database access rules, authentication, and error handling have been reviewed.
 
 ## Git workflow
 
 ```powershell
 git status
 git diff --check
-git add README.md docs backend frontend
-git commit -m "Blend AI workflows and modernize Forma UI"
+git add .github README.md docs backend frontend
+git commit -m "Add AI rate limiting and reliability checks"
 git push origin feature/chandru-frontend
 ```
 

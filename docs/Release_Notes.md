@@ -23,3 +23,14 @@
 ## Security
 
 This ZIP excludes `.git`, actual `.env` files, `node_modules`, and build output. Create `backend/.env` locally from `.env.example` and add the correct MongoDB URI. Rotate any credentials previously included in a screenshot or archive.
+
+
+## Phase 4 — Security and reliability update
+
+- Added an in-memory, configurable rate limiter to `POST /api/ai/extract`.
+- Added standard rate-limit response headers and structured HTTP 429 errors.
+- Added tests for timeout, unavailable provider, malformed model JSON, and rate-limit behavior.
+- Added `Cache-Control: no-store` to AI extraction responses.
+- Added GitHub Actions CI for backend tests, frontend lint, and frontend build.
+- Fixed two existing frontend lint errors.
+- Authentication/authorization for stored forms and submissions remains a required production blocker; the rate limiter is per-process and is not a distributed quota.
