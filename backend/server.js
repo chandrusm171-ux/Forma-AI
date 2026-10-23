@@ -4,6 +4,9 @@ const mongoose = require("mongoose");
 const app = require("./app");
 const connectDB = require("./config/db");
 
+const http = require("node:http");
+const { createSocketServer } = require("./realtime/socketServer");
+
 const PORT = Number(process.env.PORT) || 5000;
 const DB_RETRY_INTERVAL_MS = Math.max(
   5000,
@@ -46,11 +49,13 @@ async function connectWithRetry() {
   }
 }
 
-const server = app.listen(PORT, () => {
+const server = http.createServer(app);
+const io = createSocketServer(server);
+
+server.listen(PORT, () => {
   console.log(`Forma-AI API listening on port ${PORT}`);
   void connectWithRetry();
 });
-
 server.on("error", (error) => {
   console.error("HTTP server failed to start:", error.message);
   process.exitCode = 1;
@@ -62,7 +67,7 @@ async function shutdown(signal) {
   clearTimeout(retryTimer);
   console.log(`${signal} received; shutting down Forma-AI backend...`);
 
-  server.close(async () => {
+   io.close(async () => {
     try {
       await mongoose.disconnect();
       process.exitCode = 0;
