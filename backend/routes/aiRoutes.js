@@ -1,4 +1,5 @@
 const express = require("express");
+const createRateLimiter = require("../middleware/rateLimit");
 const {
   AIServiceError,
   extractFormData,
@@ -6,7 +7,14 @@ const {
 
 const router = express.Router();
 
-router.post("/extract", async (req, res) => {
+const aiRateLimit = createRateLimiter({
+  windowMs: Math.max(1000, Number(process.env.AI_RATE_LIMIT_WINDOW_MS) || 60_000),
+  max: Math.max(1, Number(process.env.AI_RATE_LIMIT_MAX) || 10),
+});
+
+router.post("/extract", aiRateLimit, async (req, res) => {
+  // AI output may contain user-provided personal information; avoid browser/proxy caching.
+  res.set("Cache-Control", "no-store");
   try {
     const { text, schemaId = "insurance-claim" } = req.body || {};
     const data = await extractFormData({ text, schemaId });

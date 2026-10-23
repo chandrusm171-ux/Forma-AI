@@ -48,9 +48,10 @@ function Navbar({ brandName = "Forma AI" }) {
     return () => window.removeEventListener("resize", handleResize);
   }, [mobileOpen]);
 
-  /* Check backend health when the application loads */
-  const loadBackendStatus = useCallback(async () => {
-    setBackendStatus("checking");
+  /* Check backend health when the application loads without synchronously
+     scheduling state updates from the effect body. */
+  const loadBackendStatus = useCallback(async ({ showChecking = true } = {}) => {
+    if (showChecking) setBackendStatus("checking");
     try {
       const health = await checkBackendHealth();
 
@@ -61,15 +62,33 @@ function Navbar({ brandName = "Forma AI" }) {
       } else {
         setBackendStatus("offline");
       }
-    } catch (error) {
-      console.error("Backend health check failed:", error);
+    } catch {
       setBackendStatus("offline");
     }
   }, []);
 
   useEffect(() => {
-    loadBackendStatus();
-  }, [loadBackendStatus]);
+    let active = true;
+
+    checkBackendHealth()
+      .then((health) => {
+        if (!active) return;
+        if (health?.success && health.database === "connected") {
+          setBackendStatus("connected");
+        } else if (health?.success) {
+          setBackendStatus("degraded");
+        } else {
+          setBackendStatus("offline");
+        }
+      })
+      .catch(() => {
+        if (active) setBackendStatus("offline");
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const getNavClass = ({ isActive }) =>
     `nav-link${isActive ? " active" : ""}`;
