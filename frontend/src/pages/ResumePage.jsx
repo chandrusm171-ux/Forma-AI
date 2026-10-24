@@ -13,10 +13,8 @@ import { parseResume } from "../services/aiService";
 /**
  * ResumePage – Resume parsing interface with loading states.
  *
- * Day 12 enhancements:
- * - Added inline ErrorState with retry functionality when backend parsing endpoint is unavailable or fails.
- * - Added Clear File action for resetting selection.
- * - Improved responsive interaction and error persistence.
+ * Phase 5: uploads PDF/DOCX resumes to the backend for text extraction and
+ * schema-aware AI parsing. Results are suggestions and must be reviewed.
  */
 const sampleResumes = [
   {
@@ -97,7 +95,10 @@ function ResumePage() {
 
   const handleLoadSample = (sample) => {
     setFileName(sample.fileName);
-    setFile({ name: sample.fileName, size: 245000 });
+    // Samples are already structured demo data, not actual files to upload.
+    setFile(null);
+    const fileInput = document.getElementById("resume-file");
+    if (fileInput) fileInput.value = "";
     setParsedData(sample.data);
     setErrorMessage("");
     showToast("success", `Loaded sample "${sample.fileName}"!`);
@@ -142,17 +143,17 @@ function ResumePage() {
           </span>
           <h1 id="resume-title">Resume & Document Parser</h1>
           <p>
-            Experience our planned document-to-schema extraction interface. Upload candidate resumes or explore interactive sample profiles below.
+            Turn a resume into a structured candidate profile. Upload a text-based PDF or DOCX, then review the extracted details before using them.
           </p>
         </div>
 
-        {/* ── Status Banner ── */}
-        <div className="resume-coming-soon" role="status">
+        {/* ── Privacy and capability note ── */}
+        <div className="resume-coming-soon" role="note">
           <span aria-hidden="true">✦</span>
           <div>
-            <strong>Phase 5 Architecture Preview</strong>
+            <strong>Document parsing is enabled</strong>
             <p>
-              Backend OCR & PDF text extraction endpoints are planned for Phase 5. The reactive upload container, validation states, and parsed schema visualizer below are fully interactive.
+              PDF and DOCX files are processed in memory and are not saved by the parser. Scanned PDFs that contain only images need OCR and are not supported yet. AI results are suggestions, not verified facts.
             </p>
           </div>
         </div>
@@ -204,13 +205,13 @@ function ResumePage() {
             <strong>{fileName || "Choose a resume or drop it here"}</strong>
             <span>
               {fileName
-                ? "File attached. Ready for document parser."
-                : "Supports PDF, DOC, DOCX up to 10MB."}
+                ? "File attached. Ready to extract text and candidate details."
+                : "Supports text-based PDF and DOCX files up to 10 MB."}
             </span>
             <div className="upload-badge-row">
               <span className="upload-pill">PDF</span>
               <span className="upload-pill">DOCX</span>
-              <span className="upload-pill">Client-Safe</span>
+              <span className="upload-pill">10 MB max</span>
             </div>
           </label>
 
@@ -218,7 +219,7 @@ function ResumePage() {
             id="resume-file"
             className="resume-file-input"
             type="file"
-            accept=".pdf,.doc,.docx"
+            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             onChange={handleFileChange}
             disabled={isParsing}
           />
@@ -279,7 +280,7 @@ function ResumePage() {
         {/* ── Error state when parsing fails ── */}
         {Boolean(errorMessage) && !isParsing && (
           <ErrorState
-            title="Resume Parsing Endpoint (Phase 5)"
+            title="Resume parsing couldn't finish"
             description={errorMessage}
             retryLabel="Retry Parsing"
             onRetry={handleParse}
@@ -292,13 +293,13 @@ function ResumePage() {
             <div className="resume-results-header">
               <div>
                 <h2>Parsed Candidate Profile</h2>
-                <p>Structured schema extracted from document content.</p>
+                <p>Review and correct these suggestions before using them in another workflow.</p>
               </div>
               <span className="resume-results-badge">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="14" height="14" aria-hidden="true">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
-                Schema Verified
+Review suggestions
               </span>
             </div>
 
@@ -313,7 +314,7 @@ function ResumePage() {
               </div>
               <div className="resume-result-item">
                 <span className="resume-result-label">Target Role</span>
-                <span className="resume-result-value">{parsedData.role || "Software Engineer"}</span>
+                <span className="resume-result-value">{parsedData.role || "—"}</span>
               </div>
               <div className="resume-result-item">
                 <span className="resume-result-label">Total Experience</span>

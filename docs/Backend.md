@@ -163,7 +163,7 @@ npm test
 | **POST** | `/api/submissions` | `requireDatabase` | Validates and persists a completed form submission | `201 Created` |
 | **GET** | `/api/submissions/:id` | `requireDatabase` | Retrieves a form submission by its ID | `200 OK` |
 | **POST** | `/api/ai/extract` | `rateLimit` (10 req/min default) | AI field extraction from natural language (local Ollama by default) | `200`, `400`, `429`, `502`, `503`, or `504` |
-| **POST** | `/api/ai/parse-resume` | None | Resume parser placeholder | `501 Not Implemented` |
+| **POST** | `/api/ai/parse-resume` | `resumeRateLimit` (3 req/min default) | In-memory PDF/DOCX text extraction and AI resume profile suggestions | `200`, `400`, `413`, `415`, `422`, `429`, `502`, `503`, or `504` |
 
 ---
 
@@ -229,12 +229,16 @@ The frontend sends:
 }
 ```
 
-When `OPENAI_API_KEY` is configured, the backend sends a structured extraction prompt to the configured OpenAI-compatible Chat Completions endpoint. The response is parsed and normalized against the allowlisted insurance-claim fields. Unknown fields and unsupported incident types are discarded. Unknown values are omitted instead of fabricated. The UI must let the user review and correct extracted values before submission.
+The backend sends a structured extraction prompt to the configured provider: local Ollama by default, or an OpenAI-compatible Chat Completions endpoint when configured. The response is parsed and normalized against the allowlisted insurance-claim fields. Unknown fields and unsupported incident types are discarded. Unknown values are omitted instead of fabricated. The UI must let the user review and correct extracted values before submission.
 
 If no provider key is configured, the endpoint returns HTTP `503` with `AI_SERVICE_NOT_CONFIGURED`. Provider failures return safe errors without forwarding the provider's raw response body. Request text is limited to 10,000 characters.
 
 ### 4. AI Resume Parser (`POST /api/ai/parse-resume`)
-Resume parsing remains a separate follow-up feature. It returns HTTP `501` with `RESUME_PARSER_NOT_CONFIGURED` until file type validation, document text extraction, and structured resume parsing are implemented.
+Send one file as multipart/form-data using the field name `resume`. PDF and DOCX are supported; legacy `.doc` is rejected. The upload is held in memory, limited to 10 MB, checked against its file signature, and not saved to disk or MongoDB by the parser. Extracted text is bounded before it is sent to the configured AI provider using the internal `resume-profile` schema. The response contains `name`, `email`, `role`, `experience`, `education`, `skills`, and `summary`; these are suggestions and must be reviewed.
+
+The built-in PDF text reader is intentionally lightweight and supports many text-based PDFs, not every PDF encoding/layout. Scanned/image-only PDFs require OCR and return `422 NO_READABLE_TEXT`. Complex PDFs with custom font encodings, encrypted documents, malformed archives, or documents that yield no usable text may fail safely. For production use, consider replacing the lightweight PDF reader with a maintained PDF extraction library and adding malware scanning/OCR as needed.
+
+Example frontend usage is implemented in `frontend/src/services/aiService.js` via `parseResume(file)`. The route applies a separate in-memory rate limit (3 requests per 60 seconds by default), sets `Cache-Control: no-store`, and does not persist the source document.
 
 ---
 
@@ -249,7 +253,7 @@ Resume parsing remains a separate follow-up feature. It returns HTTP `501` with 
 
 ## Security & Production Readiness
 This project is currently in the development MVP phase:
-- In-memory rate limiting (`middleware/rateLimit.js`) is active on `POST /api/ai/extract` (default 10 requests / 60 seconds per IP) returning standard `RateLimit-*` headers and `429` status.
+- In-memory rate limiting (`middleware/rateLimit.js`) is active on `POST /api/ai/extract` (default 10 requests / 60 seconds per IP) and `POST /api/ai/parse-resume` (default 3 requests / 60 seconds per IP), returning standard `RateLimit-*` headers and `429` status.
 - Add distributed rate limiting (e.g., Redis-backed) before scaling to multi-instance deployments.
 - Add JWT or session-based authentication before deploying to production.
 - Add authentication/authorization before exposing saved submissions or forms in production.

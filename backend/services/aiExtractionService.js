@@ -88,6 +88,19 @@ const SCHEMA_CATALOG = {
       availability: ["immediate", "2_weeks", "1_month", "gt_1_month"],
     },
   },
+  // Internal schema used only by the resume parser, not shown as a starter workflow.
+  "resume-profile": {
+    name: "Resume Profile",
+    fields: {
+      name: "string or null; candidate name only when stated",
+      email: "string or null; email address only when stated",
+      role: "string or null; current or most relevant professional role",
+      experience: "string or null; total experience only when supported",
+      education: "string or null; highest or most relevant education stated",
+      skills: "string or null; comma-separated list of explicitly listed skills",
+      summary: "string or null; concise professional summary based only on the resume",
+    },
+  },
 };
 
 class AIServiceError extends Error {
@@ -360,10 +373,9 @@ async function extractFormData(
 }
 
 function listSupportedSchemas() {
-  return Object.entries(SCHEMA_CATALOG).map(([id, def]) => ({
-    id,
-    name: def.name,
-  }));
+  return Object.entries(SCHEMA_CATALOG)
+    .filter(([id]) => id !== "resume-profile")
+    .map(([id, def]) => ({ id, name: def.name }));
 }
 
 module.exports = {

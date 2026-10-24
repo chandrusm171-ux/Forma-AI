@@ -248,3 +248,43 @@ test("AI extraction rejects malformed JSON returned by the model", async () => {
       /valid JSON/.test(error.message)
   );
 });
+
+
+test("resume-profile extraction returns only the defined resume fields", async () => {
+  const result = await extractFormData(
+    { text: "Priya Sharma is a frontend engineer with five years of experience. Email priya@example.com. Skills: React, Node.js. B.Tech Computer Science.", schemaId: "resume-profile" },
+    {
+      apiKey: "ollama-local",
+      baseUrl: "http://localhost:11434/v1",
+      fetchImpl: async (_url, options) => {
+        const request = JSON.parse(options.body);
+        assert.match(request.messages[0].content, /Resume Profile/);
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ choices: [{ message: { content: JSON.stringify({
+            name: "Priya Sharma",
+            email: "priya@example.com",
+            role: "Frontend Engineer",
+            experience: "5 years",
+            education: "B.Tech Computer Science",
+            skills: "React, Node.js",
+            summary: "Frontend engineer with five years of experience.",
+            internalNotes: "must be ignored",
+          }) } }] }),
+        };
+      },
+    }
+  );
+
+  assert.deepEqual(result, {
+    name: "Priya Sharma",
+    email: "priya@example.com",
+    role: "Frontend Engineer",
+    experience: "5 years",
+    education: "B.Tech Computer Science",
+    skills: "React, Node.js",
+    summary: "Frontend engineer with five years of experience.",
+  });
+  assert.equal(require("../services/aiExtractionService").listSupportedSchemas().length, 5);
+});

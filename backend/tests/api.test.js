@@ -68,3 +68,35 @@ test("unknown routes return a structured 404 response", async () => {
   assert.equal(response.status, 404);
   assert.equal(body.code, "ROUTE_NOT_FOUND");
 });
+
+test("resume parser rejects requests without multipart upload data", async () => {
+  const response = await fetch(`${baseUrl}/api/ai/parse-resume`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ fileName: "resume.pdf" }),
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 400);
+  assert.equal(body.success, false);
+  assert.equal(body.code, "INVALID_MULTIPART_REQUEST");
+});
+
+test("resume parser validates the uploaded file signature before invoking AI", async () => {
+  const boundary = "forma-ai-test-boundary";
+  const bodyBuffer = Buffer.concat([
+    Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="resume"; filename="resume.pdf"\r\nContent-Type: application/pdf\r\n\r\n`, "utf8"),
+    Buffer.from("not really a PDF document", "utf8"),
+    Buffer.from(`\r\n--${boundary}--\r\n`, "utf8"),
+  ]);
+  const response = await fetch(`${baseUrl}/api/ai/parse-resume`, {
+    method: "POST",
+    headers: { "content-type": `multipart/form-data; boundary=${boundary}` },
+    body: bodyBuffer,
+  });
+  const result = await response.json();
+
+  assert.equal(response.status, 415);
+  assert.equal(result.success, false);
+  assert.equal(result.code, "FILE_SIGNATURE_MISMATCH");
+});

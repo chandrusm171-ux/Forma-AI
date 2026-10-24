@@ -26,18 +26,19 @@ Forma-AI/
 
 - **Schema-Driven Forms**: Dynamic field rendering with client-side validation, live conditions, and progress tracking.
 - **AI-Assisted Field Extraction**: Natural language processing via local Ollama (`llama3.2`) or OpenAI-compatible Chat Completions.
+- **Resume Parsing (Phase 6)**: In-memory PDF/DOCX uploads, signature checks, bounded text extraction, and schema-aware AI profile suggestions. Scanned PDFs need OCR; legacy `.doc` is not supported.
 - **Five Prebuilt Workflows**: Insurance claim, patient intake, personal loan, legal intake, and job application.
 - **Human-in-the-Loop Review**: AI-prefilled fields are treated as suggestions that users can inspect and modify before submitting.
 - **Database Resilience**: MongoDB persistence with graceful fallback, `/api/health` liveness, `/api/ready` readiness checks, and `requireDatabase` guards.
-- **API Security & Rate Limiting**: In-memory fixed-window rate limiter on sensitive endpoints (`POST /api/ai/extract`), request size guards, and `Cache-Control: no-store`.
-- **Automated CI/CD**: GitHub Actions workflow executing backend test suite (20 tests), frontend ESLint checks, and production bundle builds.
+- **API Security & Rate Limiting**: In-memory fixed-window rate limiters on AI extraction and resume parsing, bounded multipart uploads, file signature checks, request size guards, and `Cache-Control: no-store`.
+- **Automated CI/CD**: GitHub Actions workflow executing backend test suite (32+ unit tests; run `npm test` after installing dependencies), frontend ESLint checks, and production bundle builds.
 - **Modern Day 16 UI**: Google Outfit & Inter typography, deep indigo-violet color palette, glassmorphism cards, ambient animated gradients, glow effects, and `prefers-reduced-motion` compliance.
 
 ## Important implementation notes
 
 - Keep frontend schemas in `frontend/src/schemas/formSchema.js` aligned with the backend `SCHEMA_CATALOG` in `backend/services/aiExtractionService.js`.
 - AI extraction currently supports these five schemas; adding a UI template alone does not automatically add backend extraction support.
-- Resume parsing remains unimplemented and explicitly returns a `501 Not Implemented` response.
+- Resume parsing is implemented for text-based PDF and DOCX files, but its lightweight PDF reader is not a substitute for a mature parser/OCR pipeline in production.
 - Rate limiting is currently in-memory per-process; for multi-instance deployments, use a distributed store such as Redis.
 - Preserve TLS verification for MongoDB Atlas. Do not use insecure TLS flags as a workaround.
 - Do not commit `.env` files, credentials, dependencies, or build output.
