@@ -32,16 +32,15 @@ export async function extractFormData(story, schemaId = "insurance-claim") {
   }
 }
 
-/** Send a resume file to the backend parser when that endpoint is implemented. */
+/** Upload a PDF/DOCX resume for bounded text extraction and schema-aware AI parsing. */
 export async function parseResume(file) {
   if (!(file instanceof File)) {
     throw new Error("Please select a resume file before parsing.");
   }
 
-  const allowedTypes = ["application/pdf"];
-  const allowedExtensions = /\.(pdf|doc|docx)$/i;
-  if (!allowedTypes.includes(file.type) && !allowedExtensions.test(file.name)) {
-    throw new Error("Please select a PDF, DOC, or DOCX resume.");
+  const allowedExtensions = /\.(pdf|docx)$/i;
+  if (!allowedExtensions.test(file.name)) {
+    throw new Error("Please select a PDF or DOCX resume. Legacy DOC files are not supported yet.");
   }
 
   if (file.size > 10 * 1024 * 1024) {
@@ -52,8 +51,8 @@ export async function parseResume(file) {
   body.append("resume", file);
 
   try {
+    // Let Axios/browser attach the multipart boundary automatically.
     const response = await api.post("/ai/parse-resume", body, {
-      headers: { "Content-Type": "multipart/form-data" },
       timeout: 60000,
     });
     return getResponseData(response);

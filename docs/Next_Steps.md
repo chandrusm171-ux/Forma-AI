@@ -1,69 +1,64 @@
-# Forma AI — Next Steps
+# Forma-AI — Next Steps and Phase Roadmap
 
-## Phase 3 — Blend and verify the AI workflows
+## Completed baseline
 
-- [ ] Confirm `ollama list` includes `llama3.2` and the local API responds.
-- [ ] Run `npm test` in `backend/`.
-- [ ] Start the backend and test `POST /api/ai/extract` for each supported `schemaId`.
-- [ ] Start the frontend and test the five workflows from the Home page.
-- [ ] Verify AI suggestions prefill only valid fields, and conditional fields respond correctly.
-- [ ] Submit each workflow and confirm MongoDB persistence.
-- [ ] Run frontend `npm run lint` and `npm run build` on Windows.
-- [ ] Test responsive layouts and keyboard focus on mobile, tablet, and desktop widths.
+- [x] Five dynamic workflows: Insurance Claim, Patient Intake, Personal Loan, Legal Intake, and Job Application.
+- [x] React/Vite frontend, Express API, MongoDB persistence, and Ollama/OpenAI-compatible schema-aware extraction.
+- [x] Modern responsive visual system, ambient animation, transitions, and reduced-motion support.
+- [x] AI extraction rate limiting, safe provider errors, `Cache-Control: no-store`, and GitHub Actions CI workflow.
 
-## Phase 4 — Security and reliability (Completed)
+## Phase 6 — Resume parsing (implemented; local verification required)
 
-### Implemented in this release
+- [x] Implemented `POST /api/ai/parse-resume` for multipart uploads with the field name `resume`.
+- [x] Added 10 MB upload size limits, in-memory handling, extension/signature checks, and a dedicated rate limit (3 requests/minute by default).
+- [x] Added lightweight text extraction for text-based PDF and DOCX files using Node.js built-ins; the original document is not persisted.
+- [x] Added an internal `resume-profile` schema and returns `name`, `email`, `role`, `experience`, `education`, `skills`, and `summary` suggestions.
+- [x] Updated ResumePage and the frontend client to use the live endpoint and accurately describe supported formats.
+- [x] Added unit tests for PDF/DOCX text extraction, file validation, upload parsing, and resume schema normalization.
+- [ ] Verify with real PDF and DOCX files on Windows and the configured Ollama model.
+- [ ] Verify malformed, encrypted, unusually encoded, and empty documents fail safely.
 
-- [x] Added configurable in-memory rate limiting to `POST /api/ai/extract`.
-- [x] Added `RateLimit-*` and `Retry-After` headers and a structured 429 response.
-- [x] Added tests for rate-limit allowance, blocking, reset windows, and separate clients.
-- [x] Added AI service tests for provider timeout, unreachable provider, and malformed model JSON.
-- [x] Set `Cache-Control: no-store` on AI extraction responses.
-- [x] Added a GitHub Actions workflow to run backend tests, frontend lint, and frontend build on pull requests and pushes.
-- [x] Fixed existing frontend lint errors in the navigation health-check effect and an unused import.
+### Known limits
 
-## Phase 5 — Day 16 Visual Overhaul & Documentation (Completed)
+- Legacy `.doc` files are not supported; save as PDF or DOCX.
+- Scanned/image-only PDFs require OCR and return `NO_READABLE_TEXT`.
+- The dependency-free PDF text reader is lightweight and cannot guarantee support for every PDF encoding/layout. Before production, consider replacing it with a maintained PDF parser and adding OCR/malware scanning if required.
+- Resume content may contain personal information. The endpoint uses `Cache-Control: no-store` and does not save the file, but data is sent to the configured AI provider. Use a local provider if resume text must stay on the machine/network.
 
-- [x] Upgraded frontend typography with Google Fonts Outfit + Inter pairing.
-- [x] Swapped generic blue palette for modern indigo-violet theme (`#4f46e5` / `#7c3aed`).
-- [x] Built keyframe animations (`gradientShimmer`, `glowPulse`, `badgeGlow`).
-- [x] Upgraded card glassmorphism, glowing borders, and focus rings.
-- [x] Added dynamic form progress bar and responsive improvements.
-- [x] Refreshed all repository documentation (`README.md`, `docs/Backend.md`, `docs/Frontend.md`, `docs/Project_Structure.md`, `docs/Release_Notes.md`).
+## Phase 7 — Production hardening (not complete; required before multi-user deployment)
 
-## Phase 6 — Production Hardening (Required before multi-user deployment)
-
-- [ ] Add authentication and authorization before exposing stored forms/submissions. Submission lookup is currently not a substitute for access control.
-- [ ] Consider a shared rate-limit store (such as Redis) before running multiple backend instances. The included limiter is in-memory and resets on server restart.
-- [ ] Configure trusted proxy handling only when deployed behind a known proxy; do not blindly trust forwarded IP headers.
+- [ ] Add authentication and authorization before exposing stored forms/submissions.
+- [ ] Scope each form/submission read and mutation to an authorized user/role.
+- [ ] Consider a shared rate-limit store such as Redis before multiple backend instances.
+- [ ] Configure trusted proxy handling only behind a known proxy; do not blindly trust forwarded IP headers.
 - [ ] Add CSRF protections if cookie-based authentication is introduced.
-- [ ] Review retention, deletion, and access policies for personal/health/financial/legal data.
-- [ ] Perform an end-to-end test against a running Ollama instance and MongoDB.
-- [ ] Verify the frontend production build on Windows and ensure CI passes.
+- [ ] Review data retention, deletion, and access policies for personal/health/financial/legal/resume data.
+- [ ] Add request audit logs that exclude secrets and personal document content.
+- [ ] Verify secure deployment headers, TLS, and production environment configuration.
 
-### Rate limit configuration
+## Phase 8 — End-to-end verification and team release
+
+- [ ] In `backend/`, run `npm ci`, `npm test`, then `npm run dev`.
+- [ ] Verify `POST /api/ai/extract` against Ollama for all five starter workflow schema IDs.
+- [ ] Verify `POST /api/ai/parse-resume` with real text-based PDF and DOCX files.
+- [ ] Verify form prefill, conditional fields, and MongoDB submission persistence.
+- [ ] In `frontend/`, run `npm ci`, `npm run lint`, `npm run build`, then `npm run dev`.
+- [ ] Check keyboard navigation, reduced motion, and responsive layouts at mobile/tablet/desktop sizes.
+- [ ] Ensure `.env`, `.env.local`, `.git`, `node_modules`, `dist`, and credentials are excluded from shared ZIPs.
+- [ ] Review `git diff --check`, commit source/tests/docs, push the feature branch, and open a pull request into `develop`.
+
+## Configuration
 
 In `backend/.env`:
 
 ```env
 AI_RATE_LIMIT_WINDOW_MS=60000
 AI_RATE_LIMIT_MAX=10
+RESUME_RATE_LIMIT_WINDOW_MS=60000
+RESUME_RATE_LIMIT_MAX=3
 ```
 
-This default permits up to 10 AI extraction requests per client in a 60-second window. Tune it to your usage and hardware.
-
-## Phase 5 — Resume parsing
-
-Resume parsing is intentionally not implemented yet. Before enabling it, add secure upload handling, size limits, MIME/extension checks, file signature validation, PDF/DOC/DOCX text extraction, and tests for malformed or unsafe files. Do not report a successful parse until actual extracted data is returned.
-
-## Phase 6 — Team workflow and deployment
-
-- Review `git status` and `git diff --check`.
-- Keep `.env`, `.env.local`, `node_modules`, `dist`, and credentials out of commits and shared ZIPs.
-- Commit source, tests, and documentation only.
-- Push `feature/chandru-frontend` and open a pull request into `develop`.
-- Deploy only after the production environment variables, database access rules, authentication, and error handling have been reviewed.
+These in-memory limits apply per backend process and reset on restart. They are not a substitute for a distributed rate limiter in multi-instance production.
 
 ## Git workflow
 
@@ -71,8 +66,8 @@ Resume parsing is intentionally not implemented yet. Before enabling it, add sec
 git status
 git diff --check
 git add .github README.md docs backend frontend
-git commit -m "Add AI rate limiting and reliability checks"
+git commit -m "Implement safe PDF and DOCX resume parsing"
 git push origin feature/chandru-frontend
 ```
 
-Before sharing any archive, exclude `.git`, all real `.env` files, dependencies, and build output. If a database password or API key has been shared in a screenshot/archive, rotate it.
+Before sharing any archive, exclude `.git`, all real `.env` files, dependencies, and build output. Rotate any database password or API key that was included in a screenshot/archive.

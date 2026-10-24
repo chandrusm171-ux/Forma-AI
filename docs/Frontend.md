@@ -12,12 +12,12 @@
 
 - `src/pages/Home.jsx` — Hero section with glowing brand badge, animated headline shimmer, workflow category filters, interactive preview cards, and stats counters.
 - `src/pages/FormPage.jsx` — Multi-step dynamic form interface, workflow template switcher, prefill handling, and review modal.
-- `src/pages/ResumePage.jsx` — Resume file dropzone interface (backend parsing placeholder returning 501).
+- `src/pages/ResumePage.jsx` — PDF/DOCX upload interface, parsing/loading/error states, candidate profile results, and sample profiles.
 - `src/schemas/formSchema.js` — Client schemas for 5 workflows (Insurance Claim, Patient Intake, Personal Loan, Legal Intake, Job Application).
 - `src/components/ai/MagicInput.jsx` — Natural language prompt text area with live extraction status, sample quick-pick chips, and `glowPulse` busy animations.
 - `src/components/forms/DynamicForm.jsx` — Recursive field renderer, live conditional visibility, inline validation errors, and submission handling.
 - `src/components/common/Navbar.jsx` — Saturated backdrop-filter navigation bar with active route indicators and brand badge.
-- `src/services/aiService.js` — Frontend AI client communicating with `/api/ai/extract` (keeps all API tokens backend-side).
+- `src/services/aiService.js` — Frontend AI client for `/api/ai/extract` and multipart `/api/ai/parse-resume` (keeps provider credentials backend-side).
 - `src/index.css` — Central design system with custom properties, typography, keyframe animations, glassmorphism cards, and reduced-motion rules.
 
 ## Day 16 UI Visual Overhaul

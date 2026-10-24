@@ -10,7 +10,8 @@ Forma AI is an AI-assisted dynamic form engine. Users describe information in na
 - Schema-aware extraction that rejects unknown fields, mismatched primitive types, and invalid enum/date values.
 - Animated, responsive UI refresh: ambient gradient motion, glass surfaces, floating workflow preview, hover transitions, staggered cards, and reduced-motion support.
 - Added configurable AI extraction rate limiting, timeout/provider failure tests, and GitHub Actions CI.
-- Updated setup and Phase 4 security/reliability checklist.
+- Implemented Phase 6 resume parsing for text-based PDF and DOCX files with in-memory upload handling, signature validation, size limits, and schema-aware AI extraction.
+- Added resume upload rate limiting and parser/document tests.
 
 ## Team roles
 
@@ -95,7 +96,7 @@ The endpoint returns suggestions only. Users should review every value before su
 - `GET /api/health` — liveness
 - `GET /api/ready` — readiness / database status
 - `POST /api/ai/extract` — schema-aware AI extraction
-- `POST /api/ai/parse-resume` — intentionally returns `501` until resume parsing is implemented
+- `POST /api/ai/parse-resume` — accepts one PDF/DOCX resume as multipart field `resume`, extracts readable text, then returns structured profile suggestions
 - Form and submission routes — see `docs/Backend.md`
 
 ## Roadmap
@@ -104,9 +105,10 @@ The endpoint returns suggestions only. Users should review every value before su
 2. Verify form prefill, conditional fields, submission persistence, and API errors.
 3. Run frontend lint and production build on Windows.
 4. Complete live Ollama + MongoDB end-to-end verification.
-5. Add authentication/authorization before exposing stored forms/submissions to multiple users.
-6. Implement safe resume parsing as a separate milestone.
-7. Commit source/docs/tests only, push the feature branch, and open a PR into `develop`.
+5. Verify resume parsing using real text-based PDF and DOCX files; scanned PDFs need OCR and legacy `.doc` is not supported.
+6. Add authentication/authorization before exposing stored forms/submissions to multiple users.
+7. Review document parser limitations and consider a mature PDF library/OCR pipeline before production.
+8. Commit source/docs/tests only, push the feature branch, and open a PR into `develop`.
 
 ## Security notes
 
@@ -114,5 +116,6 @@ The endpoint returns suggestions only. Users should review every value before su
 - Never commit `.env`, `.env.local`, `node_modules`, or build output.
 - Rotate any database credential that has been included in a screenshot or shared archive.
 - AI output is untrusted input and must be reviewed by a person.
+- Resume uploads are processed in memory and not saved by the parser. The built-in PDF text reader supports text-based PDFs; scanned/image-only documents require OCR and are rejected with a clear error. Legacy `.doc` files are not supported; use PDF or DOCX.
 - The included AI rate limiter is in-memory and per backend process; use a shared store for multi-instance deployments.
 - Do not expose form/submission endpoints publicly until authentication and authorization are implemented.

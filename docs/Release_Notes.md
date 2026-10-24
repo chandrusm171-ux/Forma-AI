@@ -7,7 +7,9 @@
 - Added type-safe output normalization and exact enum/date validation.
 - Updated the AI extraction success message for all workflow types.
 - Redesigned Home and Form pages with a responsive visual system, animated ambient gradients, floating preview elements, staggered workflow cards, hover transitions, and reduced-motion support.
-- Added explicit messaging that resume parsing is planned but not implemented in this release.
+- Implemented resume parsing for text-based PDF and DOCX uploads using bounded in-memory processing and schema-aware AI extraction.
+- Added upload size limits, file signature checks, dedicated resume parsing rate limiting, and `Cache-Control: no-store`.
+- Added document extraction and multipart upload unit tests; legacy `.doc` and scanned/image-only PDF files return clear errors.
 - Updated setup, architecture, frontend, backend, and next-step documentation.
 - Corrected the root `.gitignore` dependency entry and removed the unnecessary root lockfile.
 
@@ -51,3 +53,23 @@ This ZIP excludes `.git`, actual `.env` files, `node_modules`, and build output.
   - Updated `Frontend.md` with Zustand store details, design tokens, and UI overhaul specifications.
   - Aligned `Project_Structure.md` with CI workflow, rate limiter, and updated team roles.
   - Updated `Next_Steps.md` reflecting completed Phase 4 security and Day 16 UI polish.
+
+
+## Phase 6 — Resume parsing
+
+- Replaced the `501 Not Implemented` placeholder for `POST /api/ai/parse-resume` with multipart PDF/DOCX upload handling.
+- Added a bounded, dependency-free PDF/DOCX text extraction utility using Node.js built-ins.
+- Added an internal `resume-profile` extraction schema without exposing it as a sixth starter workflow.
+- Normalizes extracted profile fields and splits skills into a deduplicated array.
+- Updated ResumePage copy and file picker to reflect supported file types and explain the OCR limitation.
+- Added tests for text extraction, malformed signatures, unsupported formats, upload field checks, and resume schema normalization.
+
+## Phase 6 — Resume parsing (current update)
+
+- Replaced the `501 Not Implemented` placeholder for `POST /api/ai/parse-resume` with multipart PDF/DOCX upload handling.
+- Added bounded in-memory upload processing (10 MB maximum), file signature validation, and a separate configurable rate limit (3 requests per 60 seconds by default).
+- Added lightweight text extraction for text-based PDFs and DOCX documents using Node.js built-ins, without adding runtime dependencies.
+- Added an internal `resume-profile` schema and normalized candidate fields: name, email, role, experience, education, skills, and summary.
+- Updated the Resume page to call the live endpoint and clearly communicate supported file formats, privacy handling, and the OCR limitation.
+- Added unit tests for PDF/DOCX text extraction, malformed file signatures, unsupported formats, upload field validation, and resume schema normalization.
+- 32 focused backend unit tests pass in the available environment. The API integration test file could not be executed in this environment because project dependencies (including Express) were not installed; run `npm ci` then `npm test` locally/CI.
