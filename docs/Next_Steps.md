@@ -11,19 +11,28 @@
 - [ ] Run frontend `npm run lint` and `npm run build` on Windows.
 - [ ] Test responsive layouts and keyboard focus on mobile, tablet, and desktop widths.
 
-## Phase 4 — Security and reliability (this update)
+## Phase 4 — Security and reliability (Completed)
 
 ### Implemented in this release
 
-- Added configurable in-memory rate limiting to `POST /api/ai/extract`.
-- Added `RateLimit-*` and `Retry-After` headers and a structured 429 response.
-- Added tests for rate-limit allowance, blocking, reset windows, and separate clients.
-- Added AI service tests for provider timeout, unreachable provider, and malformed model JSON.
-- Set `Cache-Control: no-store` on AI extraction responses.
-- Added a GitHub Actions workflow to run backend tests, frontend lint, and frontend build on pull requests and pushes.
-- Fixed existing frontend lint errors in the navigation health-check effect and an unused import.
+- [x] Added configurable in-memory rate limiting to `POST /api/ai/extract`.
+- [x] Added `RateLimit-*` and `Retry-After` headers and a structured 429 response.
+- [x] Added tests for rate-limit allowance, blocking, reset windows, and separate clients.
+- [x] Added AI service tests for provider timeout, unreachable provider, and malformed model JSON.
+- [x] Set `Cache-Control: no-store` on AI extraction responses.
+- [x] Added a GitHub Actions workflow to run backend tests, frontend lint, and frontend build on pull requests and pushes.
+- [x] Fixed existing frontend lint errors in the navigation health-check effect and an unused import.
 
-### Still required before production or multi-user use
+## Phase 5 — Day 16 Visual Overhaul & Documentation (Completed)
+
+- [x] Upgraded frontend typography with Google Fonts Outfit + Inter pairing.
+- [x] Swapped generic blue palette for modern indigo-violet theme (`#4f46e5` / `#7c3aed`).
+- [x] Built keyframe animations (`gradientShimmer`, `glowPulse`, `badgeGlow`).
+- [x] Upgraded card glassmorphism, glowing borders, and focus rings.
+- [x] Added dynamic form progress bar and responsive improvements.
+- [x] Refreshed all repository documentation (`README.md`, `docs/Backend.md`, `docs/Frontend.md`, `docs/Project_Structure.md`, `docs/Release_Notes.md`).
+
+## Phase 6 — Production Hardening (Required before multi-user deployment)
 
 - [ ] Add authentication and authorization before exposing stored forms/submissions. Submission lookup is currently not a substitute for access control.
 - [ ] Consider a shared rate-limit store (such as Redis) before running multiple backend instances. The included limiter is in-memory and resets on server restart.

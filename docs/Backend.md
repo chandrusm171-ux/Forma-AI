@@ -23,7 +23,8 @@ backend/
 │   ├── healthController.js          # Liveness status and DB connectivity
 │   └── readinessController.js       # Readiness check (503 when MongoDB is disconnected)
 ├── middleware/
-│   └── requireDatabase.js           # Guard middleware returning 503 when MongoDB is not connected
+│   ├── requireDatabase.js           # Guard middleware returning 503 when MongoDB is not connected
+│   └── rateLimit.js                 # In-memory fixed-window rate limiter for sensitive endpoints
 ├── models/
 │   ├── Form.js                      # Schema & model for dynamic form definitions
 │   └── Submission.js                # Schema & model for persisted form responses
@@ -39,7 +40,9 @@ backend/
 │   ├── validateFormSchema.js        # Validates form schema structure, field types, and conditions
 │   └── validateSubmissionPayload.js # Validates submission payload (formId, formTitle, data)
 ├── tests/
+│   ├── aiExtraction.test.js         # AI extraction service unit tests (timeout, malformed JSON, provider failure)
 │   ├── api.test.js                  # HTTP smoke tests for health, readiness, malformed JSON and 404s
+│   ├── rateLimit.test.js            # Rate limiter unit tests (allowance, block, headers, resets)
 │   └── validation.test.js           # Unit tests for schema and submission validators
 ├── server.js                        # Starts HTTP server, connects/retries MongoDB, handles shutdown
 ├── package.json                     # Dependencies & scripts
@@ -59,6 +62,10 @@ backend/
 | **Days 8–9** | Connection Resilience & Isolation | Split Express app (`app.js`) from HTTP listener (`server.js`) for testability. Implemented non-blocking MongoDB connection retries (`DB_RETRY_INTERVAL_MS`) maintaining strict TLS certificate verification. |
 | **Day 10** | Schema & Submission Persistence | Implemented Mongoose models (`Form`, `Submission`), payload validation utilities (`validateFormSchema`, `validateSubmissionPayload`), and built unit/smoke test suites (`api.test.js`, `validation.test.js`). |
 | **Day 11** | Phase 2 AI Integration & UI Alignment | Integrated OpenAI-compatible Chat Completions via `aiExtractionService.js` for natural language incident extraction (`/api/ai/extract`), supported field allowlisting, safe error boundaries, and aligned payload contracts with frontend form submission. |
+| **Days 12–13** | Blended Modern Release | Schema-aware extraction across 5 workflow templates, type-safe output normalization, enum and date validation, and safe prompt parsing. |
+| **Day 14** | Rate Limiting & Security Hardening | Implemented configurable in-memory rate limiting middleware with standard headers (`RateLimit-*`, `Retry-After`), structured 429 response, and comprehensive unit tests. Added GitHub Actions CI pipeline. |
+| **Day 15** | Branch & Dependency Alignment | Synchronized development branches, validated npm dependencies, verified MongoDB Atlas connection resilience, and ensured all 20 tests pass. |
+| **Day 16** | Visual Refresh & Documentation Update | Comprehensive documentation updates across all guidebooks, added detailed API contracts, and aligned documentation with frontend Day 16 UI overhaul. |
 
 ---
 
@@ -155,7 +162,7 @@ npm test
 | **DELETE** | `/api/forms/:id` | `requireDatabase` | Deletes a form schema by its ID | `200 OK` |
 | **POST** | `/api/submissions` | `requireDatabase` | Validates and persists a completed form submission | `201 Created` |
 | **GET** | `/api/submissions/:id` | `requireDatabase` | Retrieves a form submission by its ID | `200 OK` |
-| **POST** | `/api/ai/extract` | None | AI field extraction from natural language (local Ollama by default) | `200`, `400`, `429`, `502`, `503`, or `504` |
+| **POST** | `/api/ai/extract` | `rateLimit` (10 req/min default) | AI field extraction from natural language (local Ollama by default) | `200`, `400`, `429`, `502`, `503`, or `504` |
 | **POST** | `/api/ai/parse-resume` | None | Resume parser placeholder | `501 Not Implemented` |
 
 ---
@@ -242,8 +249,10 @@ Resume parsing remains a separate follow-up feature. It returns HTTP `501` with 
 
 ## Security & Production Readiness
 This project is currently in the development MVP phase:
+- In-memory rate limiting (`middleware/rateLimit.js`) is active on `POST /api/ai/extract` (default 10 requests / 60 seconds per IP) returning standard `RateLimit-*` headers and `429` status.
+- Add distributed rate limiting (e.g., Redis-backed) before scaling to multi-instance deployments.
 - Add JWT or session-based authentication before deploying to production.
-- Add rate limiting (e.g. `express-rate-limit`) on sensitive submission and AI endpoints.
 - Add authentication/authorization before exposing saved submissions or forms in production.
-- Consider a provider-specific LangChain adapter if the team needs model switching or more advanced output parsing.
-- Configure proper TLS verification and keep connection credentials in environment variables only.
+- Request payloads are limited to 1MB; extraction text input is capped at 10,000 characters.
+- Responses on sensitive AI routes set `Cache-Control: no-store`.
+- Maintain strict TLS verification for MongoDB Atlas and keep all secrets in `.env` only.

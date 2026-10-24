@@ -34,3 +34,20 @@ This ZIP excludes `.git`, actual `.env` files, `node_modules`, and build output.
 - Added GitHub Actions CI for backend tests, frontend lint, and frontend build.
 - Fixed two existing frontend lint errors.
 - Authentication/authorization for stored forms and submissions remains a required production blocker; the rate limiter is per-process and is not a distributed quota.
+
+---
+
+## Day 16 — Visual Overhaul & Documentation Refresh
+
+- **UI Aesthetics Upgrade**:
+  - Replaced browser default typography with paired Google Fonts: **Outfit** (headings, bold modern display) and **Inter** (clean readable body).
+  - Elevated palette from default blue to an indigo-violet theme (`--color-primary: #4f46e5`, `--color-accent: #7c3aed`).
+  - Implemented dynamic CSS keyframes: `gradientShimmer` on the hero display title, `glowPulse` on active AI MagicInput inference states, and `badgeGlow` behind the navigation badge.
+  - Enhanced card glassmorphism with layered blur, subtle translucent border gradients, and elevation depth shadows (`--shadow-glow`).
+  - Added animated progress bar on multi-step forms and upgraded input focus rings (`0 0 0 4px rgba(79, 70, 229, 0.15)`).
+- **Comprehensive Documentation Refresh**:
+  - Rewrote root `README.md` with complete project overview, feature matrix, full directory tree, and 5-step local setup guide.
+  - Updated `Backend.md` with `rateLimit.js`, all 4 test suites, Day 12–16 milestones, and rate-limit endpoint contract.
+  - Updated `Frontend.md` with Zustand store details, design tokens, and UI overhaul specifications.
+  - Aligned `Project_Structure.md` with CI workflow, rate limiter, and updated team roles.
+  - Updated `Next_Steps.md` reflecting completed Phase 4 security and Day 16 UI polish.
