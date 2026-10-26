@@ -73,3 +73,13 @@ This ZIP excludes `.git`, actual `.env` files, `node_modules`, and build output.
 - Updated the Resume page to call the live endpoint and clearly communicate supported file formats, privacy handling, and the OCR limitation.
 - Added unit tests for PDF/DOCX text extraction, malformed file signatures, unsupported formats, upload field validation, and resume schema normalization.
 - 32 focused backend unit tests pass in the available environment. The API integration test file could not be executed in this environment because project dependencies (including Express) were not installed; run `npm ci` then `npm test` locally/CI.
+
+
+## Phase 7 — Authentication and access control baseline
+
+- Added account registration, login, current-user endpoint, salted password hashing, signed expiring bearer tokens, and auth rate limiting.
+- Added creator ownership to forms and owner association to authenticated submissions.
+- Protected form create/delete and submission reads with ownership checks.
+- Added the frontend sign-in/register screen and bearer-token request handling.
+- Added baseline response security headers and token/password unit tests.
+- Production still requires end-to-end account isolation testing, secure session review, shared rate limiting for multiple instances, and deployment hardening.

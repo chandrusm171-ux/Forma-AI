@@ -100,3 +100,35 @@ test("resume parser validates the uploaded file signature before invoking AI", a
   assert.equal(result.success, false);
   assert.equal(result.code, "FILE_SIGNATURE_MISMATCH");
 });
+
+
+test("form creation requires authentication before database access", async () => {
+  const response = await fetch(`${baseUrl}/api/forms`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ title: "Test", schema: { fields: [] } }),
+  });
+  const body = await response.json();
+  assert.equal(response.status, 401);
+  assert.equal(body.code, "AUTH_REQUIRED");
+});
+
+test("submission history requires authentication", async () => {
+  const response = await fetch(`${baseUrl}/api/submissions?page=1&limit=10`);
+  const body = await response.json();
+  assert.equal(response.status, 401);
+  assert.equal(body.code, "AUTH_REQUIRED");
+});
+
+test("submission reads require authentication", async () => {
+  const response = await fetch(`${baseUrl}/api/submissions/507f1f77bcf86cd799439011`);
+  const body = await response.json();
+  assert.equal(response.status, 401);
+  assert.equal(body.code, "AUTH_REQUIRED");
+});
+
+test("security headers are present on API responses", async () => {
+  const response = await fetch(`${baseUrl}/api/health`);
+  assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+  assert.equal(response.headers.get("referrer-policy"), "strict-origin-when-cross-origin");
+});
