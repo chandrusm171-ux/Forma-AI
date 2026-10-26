@@ -41,6 +41,13 @@ export const formService = {
     return unwrap(response);
   },
 
+  async listSubmissions({ page = 1, limit = 10, search = "" } = {}) {
+    const response = await api.get("/submissions", {
+      params: { page, limit, ...(search.trim() ? { search: search.trim() } : {}) },
+    });
+    return response.data;
+  },
+
   async getSubmission(submissionId) {
     if (!submissionId) throw new Error("A submission ID is required.");
     const response = await api.get(`/submissions/${encodeURIComponent(submissionId)}`);

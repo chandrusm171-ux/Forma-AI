@@ -5,12 +5,11 @@ const express = require("express");
 const Form = require("../models/Form");
 const requireDatabase = require("../middleware/requireDatabase");
 const validateFormSchema = require("../utils/validateFormSchema");
+const { authenticate } = require("../middleware/authenticate");
 
 const router = express.Router();
-router.use(requireDatabase);
-
 // POST /api/forms - Create a new form
-router.post("/", async (req, res) => {
+router.post("/", authenticate, requireDatabase, async (req, res) => {
   try {
     const { title, description, schema } = req.body;
 
@@ -34,6 +33,7 @@ router.post("/", async (req, res) => {
       title: title.trim(),
       description,
       schema,
+      createdBy: req.user.id,
     });
 
     return res.status(201).json({
@@ -52,7 +52,7 @@ router.post("/", async (req, res) => {
 });
 
 // GET /api/forms - Retrieve all forms
-router.get("/", async (req, res) => {
+router.get("/", requireDatabase, async (req, res) => {
   try {
     const forms = await Form.find()
       .select("title description createdAt updatedAt")
@@ -75,7 +75,7 @@ router.get("/", async (req, res) => {
 });
 
 // GET /api/forms/:id - Retrieve one form
-router.get("/:id", async (req, res) => {
+router.get("/:id", requireDatabase, async (req, res) => {
   try {
     const form = await Form.findById(req.params.id);
 
@@ -109,9 +109,12 @@ router.get("/:id", async (req, res) => {
 });
 
 // DELETE /api/forms/:id - Delete one form
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticate, requireDatabase, async (req, res) => {
   try {
-    const form = await Form.findByIdAndDelete(req.params.id);
+    const filter = req.user.role === "admin"
+      ? { _id: req.params.id }
+      : { _id: req.params.id, createdBy: req.user.id };
+    const form = await Form.findOneAndDelete(filter);
 
     if (!form) {
       return res.status(404).json({

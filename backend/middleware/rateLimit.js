@@ -8,6 +8,8 @@ function createRateLimiter({
   max = 10,
   keyGenerator = (req) => req.ip || req.socket?.remoteAddress || "unknown",
   now = Date.now,
+  code = "AI_RATE_LIMIT_EXCEEDED",
+  message = "Too many requests. Please wait before trying again.",
 } = {}) {
   const buckets = new Map();
 
@@ -40,8 +42,8 @@ function createRateLimiter({
       res.setHeader("Retry-After", String(retryAfterSeconds));
       return res.status(429).json({
         success: false,
-        code: "AI_RATE_LIMIT_EXCEEDED",
-        message: "Too many AI extraction requests. Please wait before trying again.",
+        code,
+        message,
         retryAfterSeconds,
       });
     }

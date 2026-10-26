@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { checkBackendHealth } from "../../services/api";
+import { getStoredUser, logoutAccount } from "../../services/authService";
 
 /**
  * Navbar – Site-wide top navigation bar.
@@ -16,6 +17,7 @@ import { checkBackendHealth } from "../../services/api";
 function Navbar({ brandName = "Forma AI" }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [backendStatus, setBackendStatus] = useState("checking");
+  const [currentUser, setCurrentUser] = useState(() => getStoredUser());
 
   /* Prevent body scroll when mobile menu is open */
   useEffect(() => {
@@ -213,11 +215,22 @@ function Navbar({ brandName = "Forma AI" }) {
           >
             Resume Parser
           </NavLink>
+          <NavLink
+            to="/submissions"
+            className={getNavClass}
+          >
+            My Submissions
+          </NavLink>
         </nav>
 
         {/* Desktop backend status */}
         <div className="navbar-actions">
           {renderStatus()}
+          {currentUser ? (
+            <button type="button" className="navbar-auth-button" onClick={() => { logoutAccount(); setCurrentUser(null); window.location.assign("/"); }}>Sign out</button>
+          ) : (
+            <NavLink to="/auth" className="navbar-auth-button">Sign in</NavLink>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -284,6 +297,11 @@ function Navbar({ brandName = "Forma AI" }) {
         >
           Resume Parser
         </NavLink>
+        {currentUser ? (
+          <button type="button" className="navbar-auth-button mobile-auth-button" onClick={() => { logoutAccount(); setCurrentUser(null); setMobileOpen(false); window.location.assign("/"); }}>Sign out</button>
+        ) : (
+          <NavLink to="/auth" className={getNavClass} onClick={() => setMobileOpen(false)}>Sign in</NavLink>
+        )}
 
         <div className="mobile-nav-status">
           {renderStatus()}

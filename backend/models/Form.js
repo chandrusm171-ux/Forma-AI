@@ -18,6 +18,7 @@ const formSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Mixed,
       required: true,
     },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null, index: true },
   },
   {
     timestamps: true,

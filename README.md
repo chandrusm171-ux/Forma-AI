@@ -12,6 +12,8 @@ Forma AI is an AI-assisted dynamic form engine. Users describe information in na
 - Added configurable AI extraction rate limiting, timeout/provider failure tests, and GitHub Actions CI.
 - Implemented Phase 6 resume parsing for text-based PDF and DOCX files with in-memory upload handling, signature validation, size limits, and schema-aware AI extraction.
 - Added resume upload rate limiting and parser/document tests.
+- Added Phase 7 baseline authentication: account registration/login, salted password hashing, signed expiring tokens, owner-scoped submission reads, form mutation protection, and a sign-in/register screen.
+- Added authenticated submission history: paginated/searchable `GET /api/submissions`, a “My Submissions” page, and on-demand detail viewing restricted to the signed-in owner.
 
 ## Team roles
 
@@ -91,6 +93,25 @@ Invoke-RestMethod `
 
 The endpoint returns suggestions only. Users should review every value before submission.
 
+## Authentication setup
+
+Copy `backend/.env.example` to `backend/.env` and set a unique `AUTH_TOKEN_SECRET` of at least 32 characters. On Windows PowerShell, generate a random value with:
+
+```powershell
+[Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(48))
+```
+
+Authentication routes:
+
+- `POST /api/auth/register` — create a regular user account
+- `POST /api/auth/login` — sign in and receive an expiring bearer token
+- `GET /api/auth/me` — retrieve the current account using `Authorization: Bearer <token>`
+- `GET /api/submissions?page=1&limit=10&search=insurance` — list the signed-in user's submissions, newest first; results are paginated and search matches workflow title/ID.
+
+Form creation/deletion and submission reads require authentication. Public form reading and public form submissions remain enabled for the current demo workflow. Submission reads are owner-scoped; `GET /api/submissions` lists only the signed-in user's records, and detail reads are owner-scoped. Submissions created anonymously have no owner and cannot be retrieved through the protected read endpoints. Open **My Submissions** from the navbar to browse saved responses. Public registration cannot create admins.
+
+The frontend stores the short-lived bearer token in `sessionStorage`. This is a development baseline, not the strongest option for sensitive production data; consider secure HttpOnly cookies plus CSRF protection. In-memory rate limits are per process and need a shared store for multi-instance deployment.
+
 ## Routes
 
 - `GET /api/health` — liveness
@@ -102,7 +123,7 @@ The endpoint returns suggestions only. Users should review every value before su
 ## Roadmap
 
 1. Run backend tests and verify all five workflow extraction paths with Ollama.
-2. Verify form prefill, conditional fields, submission persistence, and API errors.
+2. Verify form prefill, conditional fields, submission persistence, My Submissions listing/detail view, and API errors.
 3. Run frontend lint and production build on Windows.
 4. Complete live Ollama + MongoDB end-to-end verification.
 5. Verify resume parsing using real text-based PDF and DOCX files; scanned PDFs need OCR and legacy `.doc` is not supported.

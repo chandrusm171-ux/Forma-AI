@@ -52,6 +52,41 @@ backend/
 
 ---
 
+## Submission History API
+
+- `POST /api/submissions` validates the payload and persists it to MongoDB. If a valid bearer token is present, `ownerId` is assigned to that account; anonymous submissions remain supported and use `ownerId: null`.
+- `GET /api/submissions?page=1&limit=10&search=insurance` requires authentication and returns only the current user's submissions. The list contains summary metadata and pagination information, not the submitted field values.
+- `GET /api/submissions/:id` requires authentication and returns the full submission only to its owner (or an admin).
+- The frontend route `/submissions` is linked as **My Submissions** in the main navigation. It supports search, pagination, refresh, and loading full values on demand.
+- Existing anonymous submissions are not automatically attached to an account and therefore do not appear in a user's history.
+
+Example list response:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "507f1f77bcf86cd799439011",
+      "formId": "insurance-claim",
+      "formTitle": "Insurance Claim",
+      "createdAt": "2026-10-26T10:00:00.000Z",
+      "updatedAt": "2026-10-26T10:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "totalPages": 1
+  }
+}
+```
+
+The API clamps page size to a maximum of 50 and escapes search input before using it in a MongoDB regular expression. A compound index on `ownerId` and `createdAt` supports owner-scoped newest-first queries.
+
+---
+
 ## Daily Progress Log (Backend)
 
 | Day | Milestone | Summary |
@@ -260,3 +295,12 @@ This project is currently in the development MVP phase:
 - Request payloads are limited to 1MB; extraction text input is capped at 10,000 characters.
 - Responses on sensitive AI routes set `Cache-Control: no-store`.
 - Maintain strict TLS verification for MongoDB Atlas and keep all secrets in `.env` only.
+
+
+## Authentication (Phase 7)
+
+The API exposes `/api/auth/register`, `/api/auth/login`, and `/api/auth/me`. Passwords are hashed with Node.js `scrypt` and random salts. Tokens are signed with HMAC-SHA256, expire after `AUTH_TOKEN_TTL_SECONDS`, and are accepted through the `Authorization: Bearer` header. Set `AUTH_TOKEN_SECRET` to a unique random value of at least 32 characters. Public registration only creates the `user` role.
+
+Form creation/deletion requires authentication; delete operations are scoped to the form creator unless the user role is `admin`. Submission reads require authentication and are scoped to `ownerId` unless admin. Public form submission remains enabled; if a valid bearer token is supplied, the new submission is assigned to that user. Anonymous submissions are stored with no owner and cannot be retrieved using the protected read endpoint.
+
+The in-memory auth rate limiter is for local/single-instance use only. The frontend stores bearer tokens in `sessionStorage`; for sensitive production deployments, review an HttpOnly-cookie session approach and CSRF protection.
