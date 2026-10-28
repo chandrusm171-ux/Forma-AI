@@ -53,7 +53,7 @@ export async function parseResume(file) {
   try {
     // Let Axios/browser attach the multipart boundary automatically.
     const response = await api.post("/ai/parse-resume", body, {
-      timeout: 60000,
+      timeout: 120000,
     });
     return getResponseData(response);
   } catch (error) {

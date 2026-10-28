@@ -83,3 +83,10 @@ This ZIP excludes `.git`, actual `.env` files, `node_modules`, and build output.
 - Added the frontend sign-in/register screen and bearer-token request handling.
 - Added baseline response security headers and token/password unit tests.
 - Production still requires end-to-end account isolation testing, secure session review, shared rate limiting for multiple instances, and deployment hardening.
+
+## Phase 9 — Production Deployment & Final Security Hardening
+- Require signed-token authentication for Socket.IO connections.
+- Derive realtime identity from verified tokens rather than client payloads.
+- Run backend tests, frontend lint/build, and live MongoDB/Ollama smoke tests.
+- Verify per-user submission isolation and review room-level authorization before production.
+- Configure deployment secrets, HTTPS, privacy/retention policies, and shared rate limiting before scaling.

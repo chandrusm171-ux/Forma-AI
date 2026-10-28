@@ -4,6 +4,8 @@ const assert = require("node:assert/strict");
 const http = require("node:http");
 const { io: createClient } = require("socket.io-client");
 const Y = require("yjs");
+process.env.AUTH_TOKEN_SECRET = "test-secret-for-forma-ai-realtime-suite-32chars-minimum";
+const { signToken } = require("../utils/authTokens");
 const { createSocketServer } = require("../realtime/socketServer");
 
 async function createTestServer() {
@@ -28,7 +30,9 @@ async function createTestServer() {
 
 function connectClient(url) {
   return new Promise((resolve, reject) => {
+    const token = signToken({ _id: "test-user", email: "tester@example.com", role: "user" });
     const socket = createClient(url, {
+      auth: { token },
       transports: ["websocket"],
       reconnection: false,
       timeout: 3000,

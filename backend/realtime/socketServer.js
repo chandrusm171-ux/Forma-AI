@@ -1,6 +1,7 @@
 
 const { Server } = require("socket.io");
 const Y = require("yjs");
+const { verifyToken } = require("../utils/authTokens");
 
 function createSocketServer(httpServer) {
   const allowedOrigin =
@@ -14,6 +15,20 @@ function createSocketServer(httpServer) {
   });
 
   const rooms = new Map();
+
+  // Every realtime connection must present a valid signed session token.
+  // User identity is derived from the token, never from client-supplied userId.
+  io.use((socket, next) => {
+    const token = socket.handshake.auth?.token;
+    try {
+      const user = verifyToken(token);
+      if (!user) return next(new Error("Authentication required"));
+      socket.data.user = user;
+      return next();
+    } catch {
+      return next(new Error("Realtime authentication is not configured"));
+    }
+  });
 
   function getRoomDocument(roomId) {
     if (!rooms.has(roomId)) {
@@ -55,7 +70,7 @@ function createSocketServer(httpServer) {
   }
 
   io.on("connection", (socket) => {
-    socket.on("room:join", ({ roomId, userId, username } = {}) => {
+    socket.on("room:join", ({ roomId, username } = {}) => {
       if (
         typeof roomId !== "string" ||
         roomId.trim().length === 0 ||
@@ -75,11 +90,11 @@ function createSocketServer(httpServer) {
 
       room.users.set(socket.id, {
         socketId: socket.id,
-        userId: typeof userId === "string" ? userId.slice(0, 100) : socket.id,
+        userId: socket.data.user.id,
         username:
           typeof username === "string" && username.trim()
             ? username.trim().slice(0, 50)
-            : "Anonymous",
+            : (socket.data.user.email || "Signed-in user").slice(0, 50),
       });
 
       socket.emit("document:sync", {

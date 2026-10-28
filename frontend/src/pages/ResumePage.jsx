@@ -345,7 +345,10 @@ Review suggestions
             </div>
 
             <div className="resume-results-footer">
-              <Link to="/form?schema=job-application">
+              <Link
+                to="/form?schema=job-application"
+                state={{ resumeProfile: parsedData }}
+              >
                 <Button type="button" variant="primary" size="sm">
                   Prefill Job Application Form with this Profile →
                 </Button>

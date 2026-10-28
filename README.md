@@ -140,3 +140,10 @@ The frontend stores the short-lived bearer token in `sessionStorage`. This is a 
 - Resume uploads are processed in memory and not saved by the parser. The built-in PDF text reader supports text-based PDFs; scanned/image-only documents require OCR and are rejected with a clear error. Legacy `.doc` files are not supported; use PDF or DOCX.
 - The included AI rate limiter is in-memory and per backend process; use a shared store for multi-instance deployments.
 - Do not expose form/submission endpoints publicly until authentication and authorization are implemented.
+
+## Phase 9 — Production readiness
+
+- Socket.IO connections require a valid signed bearer token in the handshake `auth.token` field.
+- Realtime identity is derived from the verified token; client-supplied user IDs are ignored.
+- CI includes a tracked-file release-artifact check.
+- Before production, verify room-level authorization against persisted resource permissions, end-to-end MongoDB/Ollama behavior, frontend build, HTTPS, and data-retention policy.

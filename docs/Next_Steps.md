@@ -132,3 +132,10 @@ Do not use the example placeholder as a real secret. Keep the value private and 
 - [ ] Verify two accounts cannot list or open each other's submissions.
 - [ ] Confirm anonymous submissions are not shown in user history; older anonymous records are not automatically linked to users.
 - [ ] Check mobile layout, long field values, pagination, and expired-session behavior in the browser.
+
+## Phase 9 — Production Deployment & Final Security Hardening
+- Require signed-token authentication for Socket.IO connections.
+- Derive realtime identity from verified tokens rather than client payloads.
+- Run backend tests, frontend lint/build, and live MongoDB/Ollama smoke tests.
+- Verify per-user submission isolation and review room-level authorization before production.
+- Configure deployment secrets, HTTPS, privacy/retention policies, and shared rate limiting before scaling.
