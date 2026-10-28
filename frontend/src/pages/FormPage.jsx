@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import {
   DynamicForm,
   MagicInput,
@@ -176,13 +176,36 @@ const samplePromptsBySchema = {
   ],
 };
 
+function mapResumeProfileToJobApplication(profile = {}) {
+  const experienceText = String(profile.experience || "");
+  const experienceMatch = experienceText.match(/\d+(?:\.\d+)?/);
+  const yearsExperience = experienceMatch ? experienceMatch[0] : "";
+
+  return {
+    ...(profile.name ? { fullName: profile.name } : {}),
+    ...(profile.email ? { email: profile.email } : {}),
+    ...(yearsExperience ? { yearsExperience } : {}),
+    ...(profile.role ? { currentRole: profile.role, desiredRole: profile.role } : {}),
+  };
+}
+
+function requestedInitialPrefill(profile, search) {
+  const schemaId = new URLSearchParams(search).get("schema");
+  return schemaId === "job-application" && profile
+    ? mapResumeProfileToJobApplication(profile)
+    : {};
+}
+
 function FormPage() {
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedSchemaId = searchParams.get("schema");
   const selectedSchemaId = formSchemas.some((item) => item.id === requestedSchemaId)
     ? requestedSchemaId
     : insuranceClaimSchema.id;
-  const [prefillData, setPrefillData] = useState({});
+  const [prefillData, setPrefillData] = useState(() =>
+    requestedInitialPrefill(location.state?.resumeProfile, location.search)
+  );
   const [isExtracting, setIsExtracting] = useState(false);
   const [showJsonModal, setShowJsonModal] = useState(false);
   const [copiedJson, setCopiedJson] = useState(false);

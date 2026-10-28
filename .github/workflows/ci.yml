@@ -16,6 +16,8 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: backend/package-lock.json
+      - name: Check release artifacts
+        run: node backend/scripts/check-release-artifacts.js
       - name: Install backend dependencies
         run: npm ci
         working-directory: backend
