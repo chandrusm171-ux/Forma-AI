@@ -30,8 +30,8 @@ router.post("/register", authLimiter, requireDatabase, async (req, res) => {
     return res.status(400).json({ success: false, code: "INVALID_NAME", message: "Name must contain between 2 and 80 characters." });
   }
   if (!validEmail(email)) return res.status(400).json({ success: false, code: "INVALID_EMAIL", message: "Enter a valid email address." });
-  if (typeof password !== "string" || password.length < 10 || password.length > 128) {
-    return res.status(400).json({ success: false, code: "WEAK_PASSWORD", message: "Password must be between 10 and 128 characters." });
+  if (typeof password !== "string" || password.length < 6 || password.length > 128) {
+    return res.status(400).json({ success: false, code: "WEAK_PASSWORD", message: "Password must be between 6 and 128 characters." });
   }
 
   try {

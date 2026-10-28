@@ -1,44 +1,59 @@
 # Project Structure
 
 ## Overview
-Forma AI is an AI-assisted dynamic form engine. This blended release keeps the latest team project as its base and brings in schema-aware local Ollama integration, type-safe extraction, five workflow templates, in-memory rate limiting, automated CI testing, and an upgraded Day 16 modern responsive visual system.
+Forma AI is an AI-assisted dynamic form and document intelligence platform. This release incorporates schema-aware local Ollama & OpenAI-compatible extraction, dynamic multi-step form rendering, resume profile parsing, secure user authentication with JWT, submission history tracking, real-time collaboration with Socket.IO and Yjs, in-memory rate limiting, and an accessible modern UI component system.
 
 ```text
 Forma-AI/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml             # GitHub Actions CI (Backend tests, Frontend lint, Frontend build)
-├── frontend/                  # React 19 + Vite dynamic form experience
-├── backend/                   # Express 5 API, MongoDB, in-memory rate limiter, AI extraction
+├── frontend/                  # React 19 + Vite client application
+│   ├── src/
+│   │   ├── components/        # UI components, layout, dynamic form controls, and AI inputs
+│   │   ├── pages/             # Home, FormPage, ResumePage, AuthPage, SubmissionHistory
+│   │   ├── schemas/           # Client-side workflow form schemas
+│   │   ├── services/          # API, Auth, AI, and Form HTTP services
+│   │   └── store/             # Zustand state management
+├── backend/                   # Express 5 API, MongoDB, Socket.IO + Yjs collaboration, Auth & AI
+│   ├── config/                # Database connection & retry handling
+│   ├── controllers/           # Health, readiness, and endpoint handlers
+│   ├── middleware/            # Authenticate, rate limiting, and database guards
+│   ├── models/                # User, Form, and Submission Mongoose models
+│   ├── realtime/              # Socket.IO + Yjs CRDT real-time collaboration server
+│   ├── routes/                # Auth, AI, Form, Submission, and Health API routers
+│   ├── services/              # AI Chat Completions extraction provider
+│   ├── utils/                 # Auth tokens, passwords, schema & upload validators
+│   └── tests/                 # Unit tests (Auth, AI, Rate limiting, Realtime, Uploads)
 ├── docs/                      # Architecture, setup, API contracts, and release notes
 └── README.md                  # Comprehensive root documentation & onboarding guide
 ```
 
-## Responsibilities
+## Team Responsibilities
 
 | Member | Role | Responsibilities |
 |---|---|---|
-| Chandru | Team Lead | Frontend, database/testing, AI integration |
-| Khushi | Backend Developer | Express APIs, validation schemas, and database integration |
-| Vishal | Frontend Support / Docs | UI components, styling overhaul, documentation & testing |
+| Chandru | Team Lead | Architecture, AI extraction, backend APIs, real-time collaboration |
+| Khushi | Backend Developer | Express APIs, validation schemas, database models & tests |
+| Vishal | Frontend Support / Docs | UI component library, responsive styling, auth/submission pages, documentation & testing |
 
-## Main capabilities
+## Main Capabilities
 
-- **Schema-Driven Forms**: Dynamic field rendering with client-side validation, live conditions, and progress tracking.
-- **AI-Assisted Field Extraction**: Natural language processing via local Ollama (`llama3.2`) or OpenAI-compatible Chat Completions.
-- **Resume Parsing (Phase 6)**: In-memory PDF/DOCX uploads, signature checks, bounded text extraction, and schema-aware AI profile suggestions. Scanned PDFs need OCR; legacy `.doc` is not supported.
-- **Five Prebuilt Workflows**: Insurance claim, patient intake, personal loan, legal intake, and job application.
-- **Human-in-the-Loop Review**: AI-prefilled fields are treated as suggestions that users can inspect and modify before submitting.
-- **Database Resilience**: MongoDB persistence with graceful fallback, `/api/health` liveness, `/api/ready` readiness checks, and `requireDatabase` guards.
-- **API Security & Rate Limiting**: In-memory fixed-window rate limiters on AI extraction and resume parsing, bounded multipart uploads, file signature checks, request size guards, and `Cache-Control: no-store`.
-- **Automated CI/CD**: GitHub Actions workflow executing backend test suite (32+ unit tests; run `npm test` after installing dependencies), frontend ESLint checks, and production bundle builds.
-- **Modern Day 16 UI**: Google Outfit & Inter typography, deep indigo-violet color palette, glassmorphism cards, ambient animated gradients, glow effects, and `prefers-reduced-motion` compliance.
+- **User Authentication & Session Management**: Secure registration, login, and `/me` profile endpoints with Scrypt password hashing, JWT bearer tokens, in-memory rate limiting, and minimum 6-character password rules.
+- **Schema-Driven Dynamic Forms**: Dynamic field rendering (`TextField`, `SelectField`, `CheckboxField`, `TextareaField`, `ConditionalField`), client-side validation, live conditional visibility, and progress tracking.
+- **AI-Assisted Field Extraction**: Natural language extraction via local Ollama (`llama3.2`) or OpenAI-compatible Chat Completions, with type-safe normalization and bounding.
+- **Resume Parsing**: In-memory PDF/DOCX file uploads, file signature verification, bounded text extraction, and schema-driven candidate profile prefilling.
+- **Submission History**: Persisted submissions in MongoDB tied to authenticated user accounts (`/submissions`), with server-side pagination, search filtering, and submission detail modal.
+- **Real-Time Collaboration**: Collaborative form editing powered by Socket.IO and Yjs CRDT document synchronization with room isolation and cursor updates.
+- **Database Resilience**: MongoDB persistence with automatic reconnect retries, `/api/health` liveness checks, `/api/ready` readiness checks, and `requireDatabase` guards.
+- **API Security & Rate Limiting**: In-memory fixed-window rate limiters on authentication, AI extraction, and resume parsing; bounded multipart uploads; file signature checks; request size guards; and `Cache-Control: no-store`.
+- **Reusable UI Component System**: Modern design system in `frontend/src/components/ui/` (`EmptyState`, `ErrorState`, `Button`, `Input`, `Loading`, `ProgressBar`, `Skeleton`, `Toast`, `AiBadge`).
+- **Automated CI/CD**: GitHub Actions workflow executing backend test suite, frontend ESLint checks, and Vite production bundle builds.
 
-## Important implementation notes
+## Important Implementation Notes
 
-- Keep frontend schemas in `frontend/src/schemas/formSchema.js` aligned with the backend `SCHEMA_CATALOG` in `backend/services/aiExtractionService.js`.
-- AI extraction currently supports these five schemas; adding a UI template alone does not automatically add backend extraction support.
-- Resume parsing is implemented for text-based PDF and DOCX files, but its lightweight PDF reader is not a substitute for a mature parser/OCR pipeline in production.
-- Rate limiting is currently in-memory per-process; for multi-instance deployments, use a distributed store such as Redis.
-- Preserve TLS verification for MongoDB Atlas. Do not use insecure TLS flags as a workaround.
-- Do not commit `.env` files, credentials, dependencies, or build output.
+- **Environment Configuration**: `backend/.env` requires `AUTH_TOKEN_SECRET` (at least 32 characters) for authentication and token signing. `frontend/.env` specifies `VITE_API_BASE_URL`.
+- **Schema Parity**: Ensure frontend schemas in `frontend/src/schemas/formSchema.js` stay aligned with backend `SCHEMA_CATALOG` in `backend/services/aiExtractionService.js`.
+- **Password Policy**: Passwords must contain at least 6 characters (up to 128 characters).
+- **Rate Limiting**: Rate limiting is currently in-memory per-instance; use Redis for multi-instance deployments.
+- **Security**: Never commit `.env` files, production credentials, or dependency archives.

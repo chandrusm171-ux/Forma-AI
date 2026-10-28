@@ -90,3 +90,24 @@ This ZIP excludes `.git`, actual `.env` files, `node_modules`, and build output.
 - Run backend tests, frontend lint/build, and live MongoDB/Ollama smoke tests.
 - Verify per-user submission isolation and review room-level authorization before production.
 - Configure deployment secrets, HTTPS, privacy/retention policies, and shared rate limiting before scaling.
+
+
+---
+
+## Day 17 — Realtime Collaboration, Auth Polish & UI Component Library
+
+- **Real-Time Collaboration (`Socket.IO` & `Yjs`)**:
+  - Integrated Socket.IO 4 server in `backend/server.js` and `backend/realtime/socketServer.js`.
+  - Added support for isolated form editing rooms, Yjs CRDT vector/state synchronization, and live cursor awareness.
+  - Added `backend/tests/realtime.test.js` validating connection events, room isolation, and atomic updates.
+- **Authentication & Security Polish**:
+  - Configured `AUTH_TOKEN_SECRET` generation in `backend/.env` with 32+ character requirement.
+  - Updated password policy to require a minimum of 6 characters (down from 10) in both `backend/routes/authRoutes.js` and `frontend/src/pages/AuthPage.jsx` for improved usability while maintaining validation security.
+  - Added `frontend/.env` configuring `VITE_API_BASE_URL=http://localhost:5000/api`.
+  - Verified JWT token lifecycle and `Authorization: Bearer` interceptor in Axios.
+- **Submission History (`/submissions`)**:
+  - Implemented `SubmissionHistory.jsx` with search filter, pagination controls, and full submission inspection modal.
+- **Reusable UI Component System (`frontend/src/components/ui/`)**:
+  - Built and exported reusable core UI components: `EmptyState`, `ErrorState`, `Button`, `Input`, `Loading`, `ProgressBar`, `Skeleton`, `Toast`, and `AiBadge`.
+- **Documentation Synchronization**:
+  - Fully updated `docs/Project_Structure.md`, `docs/Frontend.md`, `docs/Backend.md`, and `docs/Release_Notes.md` to match the latest codebase architecture and contracts.
