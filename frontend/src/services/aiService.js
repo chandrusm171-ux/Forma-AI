@@ -1,28 +1,39 @@
-import api from "./api";
+
+import axios from "axios";
 
 function getResponseData(response) {
   return response.data?.data ?? response.data;
 }
 
 function getApiErrorMessage(error, fallback) {
+  if (error.code === "ERR_NETWORK") {
+    return "Local AI is unavailable. Start Ollama and the Forma-AI Local AI server on your computer.";
+  }
+
   return error.response?.data?.message || error.message || fallback;
 }
 
-/**
- * Ask the backend AI integration to extract values for the selected schema.
- * The backend calls a server-configured OpenAI-compatible Chat Completions API
- * (including local Ollama). This service intentionally does not fabricate data.
- */
-export async function extractFormData(story, schemaId = "insurance-claim") {
+const localAiApi = axios.create({
+  baseURL:
+    import.meta.env.VITE_LOCAL_AI_BASE_URL ||
+    "http://127.0.0.1:5001/api",
+  timeout: 120000,
+});
+
+export async function extractFormData(
+  story,
+  schemaId = "insurance-claim"
+) {
   if (typeof story !== "string" || !story.trim()) {
     throw new Error("Please provide a description before analysing.");
   }
 
   try {
-    const response = await api.post("/ai/extract", {
+    const response = await localAiApi.post("/ai/extract", {
       text: story.trim(),
       schemaId,
     });
+
     return getResponseData(response);
   } catch (error) {
     throw new Error(
@@ -32,15 +43,15 @@ export async function extractFormData(story, schemaId = "insurance-claim") {
   }
 }
 
-/** Upload a PDF/DOCX resume for bounded text extraction and schema-aware AI parsing. */
 export async function parseResume(file) {
   if (!(file instanceof File)) {
     throw new Error("Please select a resume file before parsing.");
   }
 
-  const allowedExtensions = /\.(pdf|docx)$/i;
-  if (!allowedExtensions.test(file.name)) {
-    throw new Error("Please select a PDF or DOCX resume. Legacy DOC files are not supported yet.");
+  if (!/\.(pdf|docx)$/i.test(file.name)) {
+    throw new Error(
+      "Please select a PDF or DOCX resume. Legacy DOC files are not supported yet."
+    );
   }
 
   if (file.size > 10 * 1024 * 1024) {
@@ -51,10 +62,10 @@ export async function parseResume(file) {
   body.append("resume", file);
 
   try {
-    // Let Axios/browser attach the multipart boundary automatically.
-    const response = await api.post("/ai/parse-resume", body, {
+    const response = await localAiApi.post("/ai/parse-resume", body, {
       timeout: 120000,
     });
+
     return getResponseData(response);
   } catch (error) {
     throw new Error(
