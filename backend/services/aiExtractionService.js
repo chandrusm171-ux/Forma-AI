@@ -112,28 +112,56 @@ class AIServiceError extends Error {
   }
 }
 
+
 function getProviderConfig() {
   const provider = (process.env.AI_PROVIDER || "ollama").toLowerCase();
 
   if (provider === "ollama") {
     return {
       provider: "ollama",
-      baseUrl: process.env.OLLAMA_BASE_URL || "http://localhost:11434/v1/chat/completions",
+      baseUrl:
+        process.env.OLLAMA_BASE_URL ||
+        "http://localhost:11434/v1/chat/completions",
       model: process.env.OLLAMA_MODEL || "llama3.2",
-      // Local Ollama does not require a key; some setups accept a dummy value.
       apiKey: process.env.OLLAMA_API_KEY || "ollama",
       requireKey: false,
     };
   }
 
-  return {
-    provider: "openai",
-    baseUrl: process.env.OPENAI_BASE_URL || "https://api.openai.com/v1/chat/completions",
-    model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-    apiKey: process.env.OPENAI_API_KEY || "",
-    requireKey: true,
-  };
+  if (provider === "groq") {
+    return {
+      provider: "groq",
+      baseUrl:
+        process.env.GROQ_BASE_URL ||
+        "https://api.groq.com/openai/v1/chat/completions",
+      model:
+        process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+      apiKey: process.env.GROQ_API_KEY || "",
+      requireKey: true,
+    };
+  }
+
+  if (provider === "openai") {
+    return {
+      provider: "openai",
+      baseUrl:
+        process.env.OPENAI_BASE_URL ||
+        "https://api.openai.com/v1/chat/completions",
+      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+      apiKey: process.env.OPENAI_API_KEY || "",
+      requireKey: true,
+    };
+  }
+
+  throw new AIServiceError(
+    `Unsupported AI provider: ${provider}`,
+    {
+      statusCode: 503,
+      code: "AI_PROVIDER_NOT_SUPPORTED",
+    }
+  );
 }
+
 
 function normalizeExtractedData(candidate, schemaDef) {
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
@@ -273,7 +301,7 @@ async function extractFormData(
   // When an explicit empty apiKey is passed (tests), treat as not configured for openai path
   if (apiKey === "" || (config.requireKey && !config.apiKey)) {
     throw new AIServiceError(
-      "AI extraction is not configured. Set OPENAI_API_KEY (or switch AI_PROVIDER=ollama).",
+      "AI extraction is not configured. Check the API key for your selected AI provider.",
       { statusCode: 503, code: "AI_SERVICE_NOT_CONFIGURED" }
     );
   }
@@ -335,7 +363,7 @@ async function extractFormData(
     throw new AIServiceError(
       response.status === 429
         ? "The AI provider rate limit was reached. Please try again later."
-        : `The AI provider rejected the request (HTTP ${response.status}). Check model name and that Ollama has the model pulled.`,
+        : `The AI provider rejected the request (HTTP ${response.status}). Check your API key, model name, and provider configuration.`,
       {
         statusCode,
         code: response.status === 429 ? "AI_RATE_LIMITED" : "AI_PROVIDER_REJECTED",

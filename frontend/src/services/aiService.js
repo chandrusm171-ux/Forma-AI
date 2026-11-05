@@ -1,5 +1,5 @@
 
-import axios from "axios";
+import api from "./api";
 
 function getResponseData(response) {
   return response.data?.data ?? response.data;
@@ -7,18 +7,11 @@ function getResponseData(response) {
 
 function getApiErrorMessage(error, fallback) {
   if (error.code === "ERR_NETWORK") {
-    return "Local AI is unavailable. Start Ollama and the Forma-AI Local AI server on your computer.";
+    return "Cannot connect to Forma-AI backend. Please try again later.";
   }
 
   return error.response?.data?.message || error.message || fallback;
 }
-
-const localAiApi = axios.create({
-  baseURL:
-    import.meta.env.VITE_LOCAL_AI_BASE_URL ||
-    "http://127.0.0.1:5001/api",
-  timeout: 120000,
-});
 
 export async function extractFormData(
   story,
@@ -29,10 +22,14 @@ export async function extractFormData(
   }
 
   try {
-    const response = await localAiApi.post("/ai/extract", {
-      text: story.trim(),
-      schemaId,
-    });
+    const response = await api.post(
+      "/ai/extract",
+      {
+        text: story.trim(),
+        schemaId,
+      },
+      { timeout: 120000 }
+    );
 
     return getResponseData(response);
   } catch (error) {
@@ -62,7 +59,7 @@ export async function parseResume(file) {
   body.append("resume", file);
 
   try {
-    const response = await localAiApi.post("/ai/parse-resume", body, {
+    const response = await api.post("/ai/parse-resume", body, {
       timeout: 120000,
     });
 
