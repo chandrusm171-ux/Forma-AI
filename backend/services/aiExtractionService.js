@@ -359,14 +359,26 @@ async function extractFormData(
   }
 
   if (!response.ok) {
+    const providerError = await response.text();
+
+    console.error("AI Provider Error:", {
+      provider: config.provider,
+      status: response.status,
+      body: providerError,
+    });
+
     const statusCode = response.status === 429 ? 429 : 502;
+
     throw new AIServiceError(
       response.status === 429
         ? "The AI provider rate limit was reached. Please try again later."
-        : `The AI provider rejected the request (HTTP ${response.status}). Check your API key, model name, and provider configuration.`,
+        : `The AI provider rejected the request (HTTP ${response.status}). Check model name and that Ollama has the model pulled.`,
       {
         statusCode,
-        code: response.status === 429 ? "AI_RATE_LIMITED" : "AI_PROVIDER_REJECTED",
+        code:
+          response.status === 429
+            ? "AI_RATE_LIMITED"
+            : "AI_PROVIDER_REJECTED",
       }
     );
   }
